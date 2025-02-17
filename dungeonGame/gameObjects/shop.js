@@ -24,6 +24,15 @@ export class Shop {
             else
                 this.stock.push(lootTable.common[Math.floor(Math.random() * lootTable.common.length)].clone());
         }
+        if (dungeonLevel < 10) {
+            this.stock.push(lootTable.common.find((item) => item.name === "Potion of Minor Healing"));
+        } else if (dungeonLevel < 20) {
+            this.stock.push(lootTable.uncommon.find((item) => item.name === "Potion of Healing"));
+        } else if (dungeonLevel < 30) {
+            this.stock.push(lootTable.rare.find((item) => item.name === "Potion of Vigorous Healing"));
+        } else {
+            this.stock.push(lootTable.mythic.find((item) => item.name === "Potion of Ultimate Healing"));
+        }
     }
 
     checkStock() {
