@@ -41,6 +41,10 @@ export const inventoryActionResult = (player, action, room) => {
                 console.log(chalk.blueBright("\nAction cancelled"));
                 return -1;
             }
+            if (room.isShop()) {
+                console.log(chalk.blueBright("\nYou cannot drop Items in shops"));
+                return -1;
+            }
             actionDrop(id, player, room);
             return 1;
         case 2:
