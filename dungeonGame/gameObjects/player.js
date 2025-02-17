@@ -258,7 +258,7 @@ export class Player {
             outputString += chalk.bold.red(`${encumbrance} / ${this.maxEncumbrance}\n`);
         else
             outputString += chalk.bold.blue(`${encumbrance} / ${this.maxEncumbrance}\n`);
-        outputString += chalk.green("Damage: ") + chalk.bold.blue(`${this.weapon.value + this.damageMultiplier} * ${this.damageMultiplier}`) + "\n";
+        outputString += chalk.green("Damage: ") + chalk.bold.blue(`${Math.ceil(this.weapon.value * this.damageMultiplier)}`) + "\n";
         outputString += chalk.green("\n----[Weapon]-----\nWeapon: ") + chalk.bold.blue(`${this.weapon.name} (durability: ${this.weapon.durability})\n`);
         outputString += chalk.green(" \n---[Equipment]---\nHead: ") + chalk.bold.blue(`${this.armor.head.name} (Durability: ${this.armor.head.durability})\n`);
         outputString += chalk.green("Main: ") + chalk.bold.blue(`${this.armor.main.name} (Durability: ${this.armor.main.durability})\n`);
@@ -311,26 +311,26 @@ export class Player {
 
     attack() {
         this.blocking = false;
-        let finalDamage = this.weapon.value * this.damageMultiplier;
+        let finalDamage = Math.ceil(this.weapon.value * this.damageMultiplier);
         let critDamage = 0;
         if (Math.random() <= 0.1 && this.weapon.type.split("|")[1] !== "Magic")
-            critDamage += Math.floor(finalDamage * 0.5);
+            critDamage += Math.ceil(finalDamage * 0.5);
         if (Math.random() <= 0.15 && this.damageMultiplier >= 2.5 && this.weapon.type.split("|")[1] !== "Magic")
-            critDamage += Math.floor(finalDamage * 0.5) * 1.25;
+            critDamage += Math.ceil(finalDamage * 0.5) * 1.25;
         finalDamage += critDamage;
         if (this.getEncumbrance() > 150)
             finalDamage = Math.floor(finalDamage / 2);
         if (this.weapon.durability <= 0)
             finalDamage = 0;
         this.decreaseWeaponDurability();
-        return finalDamage;
+        return Math.ceil(finalDamage);
     }
 
     takeDamage(attackValue) {
         let finalDamage = attackValue;
         let armorValue = this.getArmorValue();
         if (this.blocking && this.weapon.type.split("|")[1] !== "Magic") {
-            armorValue += Math.ceil(this.weapon.value / 3);
+            armorValue += Math.ceil(this.weapon.value);
             this.decreaseWeaponDurability();
         }
         finalDamage *= (1 - armorValue / 500);

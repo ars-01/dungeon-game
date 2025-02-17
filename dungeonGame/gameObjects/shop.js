@@ -52,16 +52,16 @@ export class Shop {
             outputString += chalk.green(`${i + 1}. `);
             switch (this.stock[i].rarity) {
                 case "Common":
-                    outputString += `${this.stock[i].name} (${this.stock[i].rarity})`;
+                    outputString += chalk.bold(`${this.stock[i].name} (${this.stock[i].rarity})`);
                     break;
                 case "Uncommon":
-                    outputString += chalk.blue(`${this.stock[i].name} (${this.stock[i].rarity})`);
+                    outputString += chalk.bold.blue(`${this.stock[i].name} (${this.stock[i].rarity})`);
                     break;
                 case "Rare":
-                    outputString += chalk.magenta(`${this.stock[i].name} (${this.stock[i].rarity})`);
+                    outputString += chalk.bold.magenta(`${this.stock[i].name} (${this.stock[i].rarity})`);
                     break;
                 case "Mythic":
-                    outputString += chalk.yellow(`${this.stock[i].name} (${this.stock[i].rarity})`);
+                    outputString += chalk.bold.yellow(`${this.stock[i].name} (${this.stock[i].rarity})`);
                     break;
                 default:
                     break;

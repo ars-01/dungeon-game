@@ -32,7 +32,7 @@ if (playerName === "dev")
 else
     player = new Player(playerName, playerClass, 100);
 
-let dungeon = new Dungeon(0, 5);
+let dungeon = new Dungeon(0, 3);
 
 dungeon.generate();
 dungeon.discoverRoom(player.getPos());
