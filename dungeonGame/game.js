@@ -7,7 +7,9 @@ import {inventoryActionResult} from "./helpers/inventoryHelper.js";
 import {shopActionResult} from "./helpers/shopHelper.js";
 import {Item} from "./gameObjects/item.js";
 import promptSync from 'prompt-sync';
-import {getItemId} from "./resources/dictionaries.js";
+import {getItemId} from "./helpers/dictionaries.js";
+import {loadData, saveData} from "./helpers/dataHelper.js";
+
 
 readline.emitKeypressEvents(process.stdin);
 
@@ -36,10 +38,10 @@ dungeon.generate();
 dungeon.discoverRoom(player.getPos());
 dungeon.print(player.getPos());
 
-process.stdin.on('keypress', (chunk, key) => {
+process.stdin.on('keypress', async (chunk, key) => {
     console.clear();
     if (!key) return;
-    if (key.name === 'q'  || player.health <= 0) {
+    if (key.name === 'q' || player.health <= 0) {
         process.exit();
     }
 
@@ -47,14 +49,14 @@ process.stdin.on('keypress', (chunk, key) => {
     if (key.name === 'n' && dungeon.isExplored()) {
         resetDungeon();
         if (dungeon.getLevel() < 10)
-            player.addItem(new Item("Potion of Minor Increase Health", "Potion|Augment|Health", 1, 5, 0.25,"Common", 23));
+            player.addItem(new Item("Potion of Minor Increase Health", "Potion|Augment|Health", 1, 5, 0.25, "Common", 23));
         else if (dungeon.getLevel() < 20)
-            player.addItem(new Item("Potion of Increase Health", "Potion|Augment|Health", 1, 10, 0.25,"Uncommon", 41));
+            player.addItem(new Item("Potion of Increase Health", "Potion|Augment|Health", 1, 10, 0.25, "Uncommon", 41));
         else if (dungeon.getLevel() < 30)
-            player.addItem(new Item("Potion of Vigorous Increase Health", "Potion|Augment|Health", 1, 15, 0.25,"Rare", 85));
+            player.addItem(new Item("Potion of Vigorous Increase Health", "Potion|Augment|Health", 1, 15, 0.25, "Rare", 85));
         else
-            player.addItem(new Item("Potion of Ultimate Increase Health", "Potion|Augment|Health", 1, 20, 0.25,"Mythic", 275));
-        player.damageBuff += 0.1;
+            player.addItem(new Item("Potion of Ultimate Increase Health", "Potion|Augment|Health", 1, 20, 0.25, "Mythic", 275));
+        player.damageMultiplier += 0.1;
     }
 
     //swaps action depending on player state
@@ -82,6 +84,20 @@ process.stdin.on('keypress', (chunk, key) => {
     if (dungeon.isExplored()) {
         console.log(chalk.green(`You cleared the Dungeon (lvl. ${dungeon.getLevel()})`));
     }
+
+    if (key.name === 'f5' && !player.isInInventory() && !player.isInShop() && !player.isFighting()) {
+        saveData(player, dungeon);
+    }
+
+    if (key.name === 'f9' && !player.isInInventory() && !player.isInShop() && !player.isFighting()) {
+        const {newPlayer, newDungeon} = await loadData(player.name);
+        player = newPlayer.clone();
+        dungeon = newDungeon.clone();
+        console.clear();
+        dungeon.print(player.getPos());
+        console.log(chalk.blueBright(`\nLoaded "${player.name}" data`));
+    }
+
 });
 
 const resetDungeon = () => {

@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import {getItemId, lootTable, firstNames, lastNames} from "../resources/dictionaries.js";
+import {getItemId, firstNames, lastNames} from "./dictionaries.js";
 
 
 export const getRandomName = () => {

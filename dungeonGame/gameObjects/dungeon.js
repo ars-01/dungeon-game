@@ -1,7 +1,7 @@
-import {getNewRoom, Room} from "./dungeonRoom.js";
+import {getNewRoom} from "./dungeonRoom.js";
 import chalk from 'chalk';
 import {processDrop, processEncounter} from "../helpers/roomHelper.js";
-import {roomArray} from "../resources/dictionaries.js";
+import {roomArray} from "../helpers/dictionaries.js";
 
 export class Dungeon {
     layout = [];
@@ -11,6 +11,12 @@ export class Dungeon {
     constructor(level, dungeonSize) {
         this.level = level;
         this.dungeonSize = dungeonSize;
+    }
+
+    clone() {
+        const copy = new Dungeon(this.level, this.dungeonSize);
+        this.layout.forEach((room) => {copy.layout.push(room.clone());});
+        return copy;
     }
 
     generate() {

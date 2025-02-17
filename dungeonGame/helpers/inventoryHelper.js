@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import {getItemId} from "../resources/dictionaries.js";
+import {getItemId} from "./dictionaries.js";
 
 const dialogueOptions = [
     chalk.green("1. Inspect an Item"),

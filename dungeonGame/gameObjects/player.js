@@ -1,6 +1,5 @@
 import chalk from "chalk";
-import {Item} from "./item.js"
-import {getRandomArmor, getRandomWeapon} from "../resources/dictionaries.js";
+import {getRandomArmor, getRandomWeapon} from "../helpers/dictionaries.js";
 
 export class Player {
     name = "";
@@ -43,6 +42,32 @@ export class Player {
             default:
                 break;
         }
+    }
+
+    clone() {
+        const copy = new Player(this.name, 0, this.maxHealth);
+        copy.name = this.name;
+        copy.pos.x = this.pos.x;
+        copy.pos.y = this.pos.y;
+        this.inventory.forEach(item => {copy.inventory.push(item.clone());});
+        copy.armor.head = this.armor.head.clone();
+        copy.armor.main = this.armor.main.clone();
+        copy.armor.arms = this.armor.arms.clone();
+        copy.armor.feet = this.armor.feet.clone();
+        copy.weapon = this.weapon.clone();
+        copy.blocking = this.blocking;
+        copy.gold = this.gold;
+        copy.maxHealth = this.maxHealth;
+        copy.maxEncumbrance = this.maxEncumbrance;
+        copy.damageMultiplier = this.damageMultiplier;
+        copy.health = this.health;
+        copy.fighting = this.fighting;
+        copy.inInventory = this.inInventory;
+        copy.inShop = this.inShop;
+        copy.combatCycleCounter = this.combatCycleCounter;
+        copy.inventoryCycleCounter = this.inventoryCycleCounter;
+        copy.shopCycleCounter = this.shopCycleCounter;
+        return copy;
     }
 
     move(direction, dungeonSize) {

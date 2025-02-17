@@ -1,8 +1,7 @@
-import {roomArray} from "../resources/dictionaries.js";
+import {roomArray} from "../helpers/dictionaries.js";
 import {Shop} from "./shop.js"
 
 export class Room {
-    //name = "real";
     layout;
     posX;
     posY;
@@ -13,6 +12,23 @@ export class Room {
     loot = [];
     shop;
     isshop = false;
+
+    clone() {
+        const copy = new Room();
+        copy.layout = this.layout;
+        copy.posX = this.posX;
+        copy.posY = this.posY;
+        copy.discovered = this.discovered;
+        copy.explored = this.explored;
+        copy.type = this.type;
+        if (this.enemy)
+            copy.enemy = this.enemy.clone();
+        this.loot.forEach(item => {copy.loot.push(item.clone());});
+        if (this.shop)
+            copy.shop = this.shop.clone();
+        copy.isshop = this.isshop;
+        return copy;
+    }
 
     setLayout(layout) {
         this.layout = layout;
@@ -96,7 +112,7 @@ export class Room {
 
 export const getNewRoom = (pos, dungeonLevel) => {
     let newRoom = new Room();
-    let index = 0;
+    let index;
     const rand = Math.floor(Math.random() * 100);
     if (rand < 60) index = 0;
     else if (rand < 75) index = 1;

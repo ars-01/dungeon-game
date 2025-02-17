@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import {lootTable, enemyTable} from "../resources/dictionaries.js";
+import {lootTable, enemyTable} from "./dictionaries.js";
 
 export const processEncounter = (player, room, dungeonLevel) => {
     const rarity = Math.floor(Math.random() * 100);

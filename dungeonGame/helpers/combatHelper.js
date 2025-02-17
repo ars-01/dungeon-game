@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import {processDrop} from "./roomHelper.js";
-import {rarityToInteger} from "../resources/dictionaries.js";
+import {rarityToInteger} from "./dictionaries.js";
 
 export const fight = (attacker, defender) => {
     let output = "";

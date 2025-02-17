@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import {getRandomArmor, getRandomWeapon, lootTable} from "../resources/dictionaries.js";
+import {getRandomArmor, getRandomWeapon} from "../helpers/dictionaries.js";
 
 const getRandomElement = () => {
     let normal;
@@ -81,7 +81,15 @@ export class Enemy {
     }
 
     clone() {
-        return new Enemy(this.name, this.type, this.damage, this.rarity, this.health, this.level);
+        const copy = new Enemy(this.name, this.type, this.damage, this.rarity, this.health, this.level);
+        copy.blocking = this.blocking;
+        copy.staggered = this.staggered;
+        copy.armor.head = this.armor.head.clone();
+        copy.armor.main = this.armor.main.clone();
+        copy.armor.arms = this.armor.arms.clone();
+        copy.armor.feet = this.armor.feet.clone();
+        copy.weapon = this.weapon.clone();
+        return copy;
     }
 
     block() {

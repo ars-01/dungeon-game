@@ -1,4 +1,4 @@
-import {lootTable} from "../resources/dictionaries.js";
+import {lootTable} from "../helpers/dictionaries.js";
 import chalk from "chalk";
 import {getRandomName} from "../helpers/shopHelper.js";
 
@@ -12,7 +12,16 @@ export class Shop {
         this.generateStock(dungeonLevel);
     }
 
+    clone() {
+        const copy = new Shop(-1);
+        copy.name = this.name;
+        this.stock.forEach(item => {copy.stock.push(item.clone());});
+        copy.gold = this.gold;
+        return copy;
+    }
+
     generateStock(dungeonLevel) {
+        if (dungeonLevel < 0) return;
         for (let i = 0; i < (5 + Math.ceil(Math.random() * 5)); i++) {
             const rand = Math.floor(Math.random() * 100) + dungeonLevel;
             if (rand > 100)
