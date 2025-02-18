@@ -202,9 +202,9 @@ export let playersList = [];
 
 export const roomArray = [
     ("## ##" +
-        "#   #" +
+        "## ##" +
         "     " +
-        "#   #" +
+        "## ##" +
         "## ##").split(""),
     ("## ##" +
         "#   #" +

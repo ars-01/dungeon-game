@@ -52,7 +52,7 @@ export class Dungeon {
     print(playerPos) {
         let outputGrid = [];
         for (let y = 0; y < this.dungeonSize; y++) {
-            let outputRow = ["", "", "", "", ""];
+            let outputRow = ["##", "##", "##", "##", "##"];
             for (let x = 0; x < this.dungeonSize; x++) {
                 switch (this.layout[x + y * this.dungeonSize].isDiscovered()) {
                     case true:
@@ -84,11 +84,19 @@ export class Dungeon {
             outputGrid.push(outputRow);
         }
         let outputString = "";
+        for (let i = 0; i < this.dungeonSize; i++) {
+            outputString += "##########";
+        }
+        outputString += "####\n";
         for (let i = 0; i < outputGrid.length; i++) {
             for (let j = 0; j < outputGrid[i].length; j++) {
-                outputString += outputGrid[i][j] + "\n";
+                outputString += outputGrid[i][j] + "##\n";
             }
         }
+        for (let i = 0; i < this.dungeonSize; i++) {
+            outputString += "##########";
+        }
+        outputString += "####\n";
 
         console.log(outputString);
     }
