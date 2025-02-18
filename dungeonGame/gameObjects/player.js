@@ -286,7 +286,7 @@ export class Player {
             armorValue += this.armor.arms.value;
         if (this.armor.feet.durability > 0)
             armorValue += this.armor.feet.value;
-        return armorValue;
+        return armorValue * this.damageMultiplier;
     }
 
     isPlayer() {

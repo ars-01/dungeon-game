@@ -7,36 +7,98 @@ import {inventoryActionResult} from "./helpers/inventoryHelper.js";
 import {shopActionResult} from "./helpers/shopHelper.js";
 import {Item} from "./gameObjects/item.js";
 import promptSync from 'prompt-sync';
-import {getItemId} from "./helpers/dictionaries.js";
+import {getItemId, playersList, showSavedPlayers} from "./helpers/dictionaries.js";
 import {loadData, loadPlayersList, saveData} from "./helpers/dataHelper.js";
 
 
 readline.emitKeypressEvents(process.stdin);
 
 const prompt = promptSync();
+let player;
+let dungeon = new Dungeon(0, 3);
 
 if (process.stdin.isTTY)
     process.stdin.setRawMode(true);
 
-const playerName = prompt(chalk.green("Name your character: "));
+const newGame = async () => {
+    const playerName = prompt(chalk.green("Name your character: "));
 
-console.log(chalk.green("Choose your starting class: \n1. Warrior\n2. Mage"));
-let playerClass = -1;
-while (playerClass < 0)
-    playerClass = getItemId(2);
+    console.log(chalk.green("Choose your starting class: \n1. Warrior\n2. Mage"));
+    let playerClass = -1;
+    while (playerClass < 0)
+        playerClass = getItemId(2);
 
-let player;
+    if (playerName === "dev")
+        player = new Player(playerName, playerClass, 30000000);
+    else
+        player = new Player(playerName, playerClass, 100);
+    return true;
+}
 
-if (playerName === "dev")
-   player = new Player(playerName, playerClass, 30000000);
-else
-    player = new Player(playerName, playerClass, 100);
+const loadGame = async () => {
+    await loadPlayersList();
+    if (playersList.length <= 0) {
+        console.log(chalk.green("No players found"));
+        return false;
+    }
+    let index = -2;
+    while (index < 0) {
+        console.clear();
+        showSavedPlayers();
+        index = getItemId(playersList.length);
+        if (index === -1)
+            process.exit();
+    }
+    const {newPlayer, newDungeon} = await loadData(playersList[index]);
+    player = await newPlayer.clone();
+    dungeon = await newDungeon.clone();
+    console.clear();
+    dungeon.print(player.getPos());
+    console.log(chalk.blueBright(`\nLoaded "${player.name}" data`));
+    return true;
+}
 
-let dungeon = new Dungeon(0, 3);
+const boot = async () => {
+    const dialogueOptions = [
+        chalk.green("1. New Game"),
+        chalk.green("2. Load Game"),
+        chalk.green("3. Quit"),
+    ];
+    let index = -2;
+    while (index < 0) {
+        console.clear();
+        dialogueOptions.forEach((option) => {console.log(option);});
+        if (playersList.length <= 0)
+            console.log(chalk.blueBright("\nNo players found\nTry selecting \"2. Load Game\"\nIf this message shows" +
+                " up again, there are no existing save files\n"));
+        index = getItemId(dialogueOptions.length);
+        if (index === -1)
+            process.exit();
+    }
+    switch (index) {
+        case 0:
+            return await newGame();
+        case 1:
+            return await loadGame();
+        case 2:
+            process.exit();
+            break;
+        default:
+            break;
+    }
+}
+
+let bootSuccessful = false;
+
+while (!bootSuccessful) {
+    bootSuccessful = await boot();
+}
 
 dungeon.generate();
 dungeon.discoverRoom(player.getPos());
 dungeon.print(player.getPos());
+
+await saveData(player, dungeon);
 
 process.stdin.on('keypress', async (chunk, key) => {
     console.clear();

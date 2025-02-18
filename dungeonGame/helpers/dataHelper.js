@@ -63,7 +63,6 @@ export const loadPlayersList = async () => {
             playersList.pop();
         }
         _playersList.forEach(playerName => {playersList.unshift(playerName)});
-        console.log(playersList);
     } catch (err) {
         console.error('Error reading or parsing file:', err);
     }

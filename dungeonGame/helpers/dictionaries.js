@@ -192,6 +192,12 @@ export const getRandomWeapon = (weaponType, weaponRarity) => {
     return weapons[Math.floor(Math.random() * weapons.length)];
 }
 
+export const showSavedPlayers = () => {
+    playersList.forEach((playerName, index) => {
+        console.log(chalk.green(`${index + 1}. ${playerName}`));
+    });
+}
+
 export let playersList = [];
 
 export const roomArray = [
