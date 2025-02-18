@@ -6,10 +6,22 @@ import {Dungeon} from "../gameObjects/dungeon.js";
 import {Room} from "../gameObjects/dungeonRoom.js";
 import {Enemy} from "../gameObjects/enemy.js";
 import {Shop} from "../gameObjects/shop.js";
+import {playersList} from "./dictionaries.js";
 
 export const saveData = async (player, dungeon) => {
+    addPlayerToList(player.name);
+
+    const playersListJSON = JSON.stringify(playersList);
     const playerJSON = JSON.stringify(player.clone());
     const dungeonJSON = JSON.stringify(dungeon.clone());
+
+    fs.writeFile(`./resources/players.json`, playersListJSON, function (err) {
+        if (err) {
+            console.error(err);
+        } else {
+
+        }
+    });
 
     fs.writeFile(`./resources/player-${player.name}.json`, playerJSON, function (err) {
         if (err) {
@@ -39,6 +51,19 @@ export const loadData = async (playerName) => {
         const newDungeon = dungeonFromJSON(_dungeon);
 
         return {newPlayer, newDungeon};
+    } catch (err) {
+        console.error('Error reading or parsing file:', err);
+    }
+}
+
+export const loadPlayersList = async () => {
+    try {
+        const _playersList = await JSON.parse(fs.readFileSync(`./resources/players.json`, 'utf8'));
+        for (let i = 0; i < playersList.length; i++) {
+            playersList.pop();
+        }
+        _playersList.forEach(playerName => {playersList.unshift(playerName)});
+        console.log(playersList);
     } catch (err) {
         console.error('Error reading or parsing file:', err);
     }
@@ -115,4 +140,9 @@ const shopFromJSON = (shop) => {
     shop.stock.forEach(item => {copy.stock.push(itemFromJSON(item));});
     copy.gold = shop.gold;
     return copy;
+}
+
+const addPlayerToList = (playerName) => {
+    if (!playersList.includes(playerName))
+        playersList.unshift(playerName);
 }

@@ -8,7 +8,7 @@ import {shopActionResult} from "./helpers/shopHelper.js";
 import {Item} from "./gameObjects/item.js";
 import promptSync from 'prompt-sync';
 import {getItemId} from "./helpers/dictionaries.js";
-import {loadData, saveData} from "./helpers/dataHelper.js";
+import {loadData, loadPlayersList, saveData} from "./helpers/dataHelper.js";
 
 
 readline.emitKeypressEvents(process.stdin);
@@ -96,6 +96,7 @@ process.stdin.on('keypress', async (chunk, key) => {
         console.clear();
         dungeon.print(player.getPos());
         console.log(chalk.blueBright(`\nLoaded "${player.name}" data`));
+        await loadPlayersList();
     }
 
 });

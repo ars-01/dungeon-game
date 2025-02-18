@@ -192,6 +192,8 @@ export const getRandomWeapon = (weaponType, weaponRarity) => {
     return weapons[Math.floor(Math.random() * weapons.length)];
 }
 
+export let playersList = [];
+
 export const roomArray = [
     ("## ##" +
         "#   #" +

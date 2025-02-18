@@ -104,7 +104,7 @@ export class Enemy {
             return 0;
         }
         this.blocking = false;
-        let finalDamage = Math.floor(this.damage * ( 1 + this.level / 10));
+        let finalDamage = Math.floor(this.damage * ( 1 + this.level / 10) * 0.7);
         let critDamage = 0;
         if (Math.random() <= 0.1 && this.type !== "Magic")
             critDamage += Math.floor(finalDamage * 0.5);
