@@ -15,6 +15,7 @@ export class Shop {
     clone() {
         const copy = new Shop(-1);
         copy.name = this.name;
+        copy.stock = [];
         this.stock.forEach(item => {copy.stock.push(item.clone());});
         copy.gold = this.gold;
         return copy;

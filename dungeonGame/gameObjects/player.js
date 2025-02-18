@@ -49,6 +49,7 @@ export class Player {
         copy.name = this.name;
         copy.pos.x = this.pos.x;
         copy.pos.y = this.pos.y;
+        copy.inventory = [];
         this.inventory.forEach(item => {copy.inventory.push(item.clone());});
         copy.armor.head = this.armor.head.clone();
         copy.armor.main = this.armor.main.clone();

@@ -59,7 +59,8 @@ export const loadData = async (playerName) => {
 export const loadPlayersList = async () => {
     try {
         const _playersList = await JSON.parse(fs.readFileSync(`./resources/players.json`, 'utf8'));
-        for (let i = 0; i < playersList.length; i++) {
+        const length = playersList.length;
+        for (let i = 0; i < length; i++) {
             playersList.pop();
         }
         _playersList.forEach(playerName => {playersList.unshift(playerName)});
@@ -73,7 +74,10 @@ const playerFromJSON = (player) => {
     copy.name = player.name;
     copy.pos.x = player.pos.x;
     copy.pos.y = player.pos.y;
-    player.inventory.forEach(item => {copy.inventory.push(itemFromJSON(item));});
+    copy.inventory = [];
+    player.inventory.forEach(item => {
+        copy.inventory.push(itemFromJSON(item));
+    });
     copy.armor.head = itemFromJSON(player.armor.head);
     copy.armor.main = itemFromJSON(player.armor.main);
     copy.armor.arms = itemFromJSON(player.armor.arms);
@@ -96,7 +100,10 @@ const playerFromJSON = (player) => {
 
 const dungeonFromJSON = (dungeon) => {
     const copy = new Dungeon(dungeon.level, dungeon.dungeonSize);
-    dungeon.layout.forEach((room) => {copy.layout.push(roomFromJSON(room));});
+    copy.layout = [];
+    dungeon.layout.forEach((room) => {
+        copy.layout.push(roomFromJSON(room));
+    });
     return copy;
 }
 
@@ -114,7 +121,10 @@ const roomFromJSON = (room) => {
     copy.type = room.type;
     if (room.enemy)
         copy.enemy = enemyFromJSON(room.enemy);
-    room.loot.forEach(item => {copy.loot.push(itemFromJSON(item));});
+    copy.loot = [];
+    room.loot.forEach(item => {
+        copy.loot.push(itemFromJSON(item));
+    });
     if (room.shop)
         copy.shop = shopFromJSON(room.shop);
     copy.isshop = room.isshop;
@@ -136,7 +146,10 @@ const enemyFromJSON = (enemy) => {
 const shopFromJSON = (shop) => {
     const copy = new Shop(-1);
     copy.name = shop.name;
-    shop.stock.forEach(item => {copy.stock.push(itemFromJSON(item));});
+    copy.stock = [];
+    shop.stock.forEach(item => {
+        copy.stock.push(itemFromJSON(item));
+    });
     copy.gold = shop.gold;
     return copy;
 }

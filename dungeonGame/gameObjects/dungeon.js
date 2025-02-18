@@ -15,7 +15,10 @@ export class Dungeon {
 
     clone() {
         const copy = new Dungeon(this.level, this.dungeonSize);
-        this.layout.forEach((room) => {copy.layout.push(room.clone());});
+        copy.layout = [];
+        this.layout.forEach((room) => {
+            copy.layout.push(room.clone());
+        });
         return copy;
     }
 

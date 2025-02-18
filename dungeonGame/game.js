@@ -15,7 +15,7 @@ readline.emitKeypressEvents(process.stdin);
 
 const prompt = promptSync();
 let player;
-let dungeon = new Dungeon(0, 3);
+let dungeon;
 
 if (process.stdin.isTTY)
     process.stdin.setRawMode(true);
@@ -32,6 +32,8 @@ const newGame = async () => {
         player = new Player(playerName, playerClass, 30000000);
     else
         player = new Player(playerName, playerClass, 100);
+    dungeon = new Dungeon(0, 3);
+    dungeon.generate();
     return true;
 }
 
@@ -59,6 +61,7 @@ const loadGame = async () => {
 }
 
 const boot = async () => {
+    await loadPlayersList();
     const dialogueOptions = [
         chalk.green("1. New Game"),
         chalk.green("2. Load Game"),
@@ -94,7 +97,7 @@ while (!bootSuccessful) {
     bootSuccessful = await boot();
 }
 
-dungeon.generate();
+console.clear();
 dungeon.discoverRoom(player.getPos());
 dungeon.print(player.getPos());
 
