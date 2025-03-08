@@ -7,6 +7,7 @@ import {Room} from "../gameObjects/dungeonRoom.js";
 import {Enemy} from "../gameObjects/enemy.js";
 import {Shop} from "../gameObjects/shop.js";
 import {playersList} from "./dictionaries.js";
+import {ShallowNode} from "./generationHelper.js";
 
 export const saveData = async (player, dungeon) => {
     addPlayerToList(player.name);
@@ -99,12 +100,29 @@ const playerFromJSON = (player) => {
 }
 
 const dungeonFromJSON = (dungeon) => {
-    const copy = new Dungeon(dungeon.level, dungeon.dungeonSize);
+    const copy = new Dungeon(dungeon.level);
     copy.layout = [];
+    copy.width = dungeon.width;
+    copy.height = dungeon.height;
     dungeon.layout.forEach((room) => {
         copy.layout.push(roomFromJSON(room));
     });
+    copy.topology = [];
+    dungeon.topology.forEach((node) => {
+        copy.topology.push(shallowNodeFromJSON(node));
+    });
+    copy.layoutMap = dungeon.layoutMap;
     return copy;
+}
+
+const shallowNodeFromJSON = (node) => {
+    const shallowCopy = new ShallowNode(node.id, node.pos);
+    shallowCopy.id = node.id;
+    shallowCopy.pos = node.pos;
+    node.connections.forEach(conn => {
+        shallowCopy.connections.push(conn);
+    });
+    return shallowCopy;
 }
 
 const itemFromJSON = (item) => {

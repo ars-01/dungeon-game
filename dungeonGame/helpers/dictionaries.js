@@ -315,7 +315,7 @@ export const lootTable = {
         //Weapons
         //Daggers
         new Item("Ebony Dagger", "Weapon|Melee", 500, 10, 5, "Rare", 290),
-        new Item("Glass Dagger", "Weapon|Melee", 500, 9, 4.5, "Uncommon", 165),
+        new Item("Glass Dagger", "Weapon|Melee", 500, 9, 4.5, "Rare", 165),
         new Item("Stahlrim Dagger", "Weapon|Melee", 500, 10, 4.5, "Rare", 395),
         //Maces
         new Item("Ebony Mace", "Weapon|Melee", 500, 16, 19, "Rare", 1000),

@@ -13,6 +13,7 @@ export class Player {
     };
     weapon = "";
 
+    lastMove = "";
     blocking = false;
     gold = 0;
     maxHealth = 100;
@@ -44,6 +45,10 @@ export class Player {
         }
     }
 
+    setPos(pos) {
+        this.pos = pos;
+    }
+
     clone() {
         const copy = new Player(this.name, 0, this.maxHealth);
         copy.name = this.name;
@@ -56,6 +61,7 @@ export class Player {
         copy.armor.arms = this.armor.arms.clone();
         copy.armor.feet = this.armor.feet.clone();
         copy.weapon = this.weapon.clone();
+        copy.lastMove = this.lastMove;
         copy.blocking = this.blocking;
         copy.gold = this.gold;
         copy.maxHealth = this.maxHealth;
@@ -71,23 +77,45 @@ export class Player {
         return copy;
     }
 
-    move(direction, dungeonSize) {
-        switch (direction){
+    move(direction, dungeon) {
+        if (direction === "back") {
+            direction = this.lastMove;
+        }
+        const curNode = dungeon.getNodeAtPos(this.pos);
+        if (curNode.id < 0) return;
+        let nextNode;
+        switch (direction) {
             case 'left':
-                if (this.pos.x > 0)
-                    this.pos.x -=1;
+                nextNode = dungeon.getNodeAtPos({x: this.pos.x - 1, y: this.pos.y});
+                if (nextNode.id < 0) return;
+                if (curNode.getConnections().includes(nextNode.id)) {
+                    this.pos.x -= 1;
+                    this.lastMove = "left";
+                }
                 break;
             case 'right':
-                if (this.pos.x < dungeonSize - 1)
-                    this.pos.x +=1;
+                nextNode = dungeon.getNodeAtPos({x: this.pos.x + 1, y: this.pos.y});
+                if (nextNode.id < 0) return;
+                if (curNode.getConnections().includes(nextNode.id)) {
+                    this.pos.x += 1;
+                    this.lastMove = "right";
+                }
                 break;
             case 'up':
-                if (this.pos.y > 0)
-                    this.pos.y -=1;
+                nextNode = dungeon.getNodeAtPos({x: this.pos.x, y: this.pos.y - 1});
+                if (nextNode.id < 0) return;
+                if (curNode.getConnections().includes(nextNode.id)) {
+                    this.pos.y -= 1;
+                    this.lastMove = "up";
+                }
                 break;
             case 'down':
-                if (this.pos.y < dungeonSize - 1)
+                nextNode = dungeon.getNodeAtPos({x: this.pos.x, y: this.pos.y + 1});
+                if (nextNode.id < 0) return;
+                if (curNode.getConnections().includes(nextNode.id)) {
                     this.pos.y +=1;
+                    this.lastMove = "down";
+                }
                 break;
             default:
                 break;
@@ -356,16 +384,12 @@ export class Player {
             this.weapon.durability = this.weapon.durability - 1 < 0 ? 0 : this.weapon.durability - 1;
     }
 
-    runAway(dungeonSize) {
-        if (this.pos.x > 0) {
-            this.move("left", dungeonSize);
-        } else {
-            this.move("right", dungeonSize);
-        }
+    runAway(dungeon) {
+        this.move("back", dungeon);
         this.fighting = false;
     }
 
-    chooseCombatAction(keyName, dungeonSize, enemy) {
+    chooseCombatAction(keyName, dungeon, enemy) {
         this.blocking = false;
         if (Math.random() < 0.3 && !enemy.isStaggered())
             enemy.block();
@@ -386,7 +410,7 @@ export class Player {
                         this.block();
                         return 1;
                     case 2:
-                        this.runAway(dungeonSize);
+                        this.runAway(dungeon);
                         return 2;
                     default:
                         break;

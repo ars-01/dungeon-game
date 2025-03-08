@@ -32,8 +32,9 @@ const newGame = async () => {
         player = new Player(playerName, playerClass, 30000000);
     else
         player = new Player(playerName, playerClass, 100);
-    dungeon = new Dungeon(0, 3);
+    dungeon = new Dungeon(0);
     dungeon.generate();
+    player.setPos(dungeon.topology[0].getPos());
     return true;
 }
 
@@ -168,13 +169,13 @@ process.stdin.on('keypress', async (chunk, key) => {
 
 const resetDungeon = () => {
     let level = dungeon.getLevel() + 1;
-    let size = dungeon.getSize();
-    dungeon = new Dungeon(level, size);
+    dungeon = new Dungeon(level);
     dungeon.generate();
+    player.setPos(dungeon.topology[0].getPos());
 }
 
 const fightingAction = (key) => {
-    const action = player.chooseCombatAction(key.name, dungeon.getSize(), dungeon.roomAt(player.getPos()).getEnemy());
+    const action = player.chooseCombatAction(key.name, dungeon, dungeon.roomAt(player.getPos()).getEnemy());
     if (action === 2) {
         dungeon.discoverRoom(player.getPos());
     }
@@ -199,7 +200,7 @@ const fightingAction = (key) => {
 }
 
 const exploreAction = (key) => {
-    player.move(key.name, dungeon.getSize());
+    player.move(key.name, dungeon);
     dungeon.discoverRoom(player.getPos());
     dungeon.print(player.getPos());
     if (key.name === 'return') {
