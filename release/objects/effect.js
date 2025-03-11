@@ -34,7 +34,7 @@ export class Effect {
             case "Mana":
                 character.manaBonus += this.magnitude * this.magnitude;
                 break;
-            case "Damage":
+            case "DamageBuff":
                 character.damageBonus += this.magnitude * this.subtype;
                 break;
             case "Armor":
@@ -53,6 +53,15 @@ export class Effect {
                     character.isParalyzed = true;
                 else
                     character.isParalysed = false;
+                break;
+            case "DamageHealth":
+                character.health = character.health - this.magnitude * this.subtype <= 0 ? 0 : character.health - this.magnitude * this.subtype;
+                break;
+            case "DamageStamina":
+                character.stamina = character.stamina - this.magnitude * this.subtype <= 0? 0 : character.stamina - this.magnitude * this.subtype;
+                break;
+            case "DamageMana":
+                character.mana = character.mana - this.magnitude * this.subtype <= 0 ? 0 : character.mana - this.magnitude * this.subtype;
                 break;
             default:
                 break;

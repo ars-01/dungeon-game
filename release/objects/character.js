@@ -1,6 +1,7 @@
 import {asBar, getColor} from "../resources/tables.js";
 import chalk from "chalk";
 import {checkSkill} from "../helpers/functionsHelper.js";
+import {Effect} from "./effect.js";
 
 export class Character {
 
@@ -721,6 +722,28 @@ export class Character {
         }
     }
 
+    learnSpell(spell) {
+        switch (spell.school) {
+            case "Destruction":
+                if (!this.spells.destruction.includes(spell))
+                    this.spells.destruction.push(spell.clone());
+                this.spells.destruction.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case "Restoration":
+                if (!this.spells.restoration.includes(spell))
+                    this.spells.restoration.push(spell.clone());
+                this.spells.restoration.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case "Alteration":
+                if (!this.spells.alteration.includes(spell))
+                    this.spells.alteration.push(spell.clone());
+                this.spells.alteration.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            default:
+                break;
+        }
+    }
+
     levelUp() {
         this.characterLevelXP = 0;
         this.characterLevel++;
@@ -784,7 +807,7 @@ export class Character {
     }
 
     castSpell(index, page = this.currentSpellBookPage ? this.currentSpellBookPage : -1) {
-        const output = {success: false, value: 0, effect: null};
+        const output = {success: false, value: 0, spell: null};
         if (page === -1 || !this.isInSpellbook)
             return output;
         let spell;
@@ -810,6 +833,7 @@ export class Character {
                 if (!this.isFighting)
                     return output;
                 output.value = Math.floor(spell.value * (1 + (this.destructionSkill / 100)));
+                output.spell = spell.clone();
                 manaCost = Math.ceil(spell.manaCost * (1 - (1 / this.destructionSkill >= 100 ? 100 : this.destructionSkill)));
                 break;
             case "Restoration":
@@ -836,13 +860,23 @@ export class Character {
             case "Armor":
                 this.effects.push(spell.effect.clone());
                 break;
+            case "Armor|MagicResistance":
+                if (!this.isFighting)
+                    output.success = false;
+                const wardType = spell.name.split(" ")[0];
+                this.effects.push(new Effect(`Ward - ${wardType}`, "MagicResistance", 1, 1, spell.value));
+                this.effects.push(new Effect(`Shield - ${wardType}`, "Armor", 1, 1, spell.value * 100));
+                break;
             case "Paralysis":
-                output.effect = spell.effect.clone();
+                if (!this.isFighting)
+                    output.success = false;
+                output.spell = spell.effect.clone();
                 break;
             default:
                 break;
         }
-        this.advanceSkill(spell.school, output.value);
+        if (output.success)
+            this.advanceSkill(spell.school, output.value);
         this.mana -= manaCost;
         return output;
     }
