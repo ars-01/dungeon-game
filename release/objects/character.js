@@ -1,5 +1,7 @@
 import {asBar, getColor} from "../resources/tables.js";
 import chalk from "chalk";
+import {checkSkill} from "../helpers/functionsHelper.js";
+import {Effect} from "./effect.js";
 
 export class Character {
 
@@ -9,10 +11,13 @@ export class Character {
 
     maxHealth;
     health;
+    healthBonus = 0;
     maxStamina;
     stamina;
+    staminaBonus = 0;
     maxMana;
     mana;
+    manaBonus = 0;
 
     gold;
     inventory = {
@@ -31,8 +36,10 @@ export class Character {
     };
     spells = {
         destruction: [],
-        restoration: []
+        restoration: [],
+        alteration: []
     }
+    effects = [];
 
     canAct = true;
     isOverencumbered = false;
@@ -40,8 +47,39 @@ export class Character {
     currentInventoryPage;
     isFighting = false;
     isBlocking = false;
-    bonusArmor = 0;
+    armorBonus = 0;
+    attackBonus = 0;
+    magicResistance = 0;
+    meleeResistance = 0;
     canTrade;
+
+    //skillLevels
+    characterLevel = 1;
+    characterLevelXP = 0;
+
+    //mage
+    destructionSkill = 1;
+    destructionSkillXP = 0;
+    restorationSkill = 1;
+    restorationSkillXP = 0;
+    alterationSkill = 1;
+    alterationSkillXP = 0;
+
+    //warrior
+    heavyArmorSkill = 1;
+    heavyArmorSkillXP = 0;
+    blockSkill = 1;
+    blockSkillXP = 0;
+    twoHandedSkill = 1;
+    twoHandedSkillXP = 0;
+    oneHandedSkill = 1;
+    oneHandedSkillXP = 0;
+
+    //thief
+    lightArmorSkill = 1;
+    lightArmorSkillXP = 0;
+    speechSkill = 1;
+    speechSkillXP = 0;
 
     constructor(name, maxHealth, maxStamina, maxMana, level = 0, isPlayer = false, canTrade = false) {
         this.name = name;
@@ -164,7 +202,7 @@ export class Character {
     }
 
     getArmorValue() {
-        let armorValue = this.bonusArmor;
+        let armorValue = this.armorBonus;
         if (this.equipment.head)
             armorValue += this.equipment.head.value;
         if (this.equipment.main)
@@ -175,7 +213,7 @@ export class Character {
             armorValue += this.equipment.feet.value;
         if (this.equipment.shield && this.isBlocking)
             armorValue += this.equipment.shield.value;
-        return armorValue / 1000;
+        return armorValue / 1000 > 1 ? 1 : armorValue / 1000;
     }
 
     addItemToInventory(item) {
@@ -401,26 +439,256 @@ export class Character {
         this.equipment.shield = null;
     }
 
+    addEffect(effect) {
+        this.effects.push(effect);
+    }
+
+    applyEffects() {
+        this.resetBuffs();
+        for (const effect of this.effects) {
+            effect.trigger(this);
+        }
+        if (this.equipment.head)
+            if (this.equipment.head.effect)
+                this.equipment.head.effect.trigger(this);
+        if (this.equipment.main)
+            if (this.equipment.main.effect)
+                this.equipment.main.effect.trigger(this);
+        if (this.equipment.arms)
+            if (this.equipment.arms.effect)
+                this.equipment.arms.effect.trigger(this);
+        if (this.equipment.feet)
+            if (this.equipment.feet.effect)
+                this.equipment.feet.trigger(this);
+    }
+
+    tidyEffects() {
+        for (let i = 0; i < this.effects.length; i++) {
+            if (this.effects[i].timeToLive > 0)
+                continue;
+            this.effects.splice(i, 1);
+            i--;
+        }
+    }
+
+    resetBuffs() {
+        this.healthBonus = 0;
+        this.staminaBonus = 0;
+        this.manaBonus = 0;
+        this.armorBonus = 0;
+        this.attackBonus = 0;
+    }
+
+    printEffects() {
+        let hasEffects = false;
+        let outputString = "\n";
+        for (const effect of this.effects) {
+            if (effect.timeToLive > 0) {
+                outputString += effect.toString() + "\n";
+                hasEffects = true;
+            }
+        }
+        if (hasEffects) {
+            console.log(chalk.blueBright(`Active effects of ${this.name}:`));
+            console.log(outputString);
+        } else {
+            console.log(chalk.blueBright(`${this.name} has no active effects`));
+        }
+    }
+
+    advanceSkill(skill, value, logMessage = this.isPlayer) {
+        switch (skill) {
+            case "Destruction":
+                this.destructionSkillXP += value;
+                if (checkSkill(this.destructionSkill, this.destructionSkillXP, 0)) {
+                    this.destructionSkillXP -= this.destructionSkill * 50;
+                    this.destructionSkill++;
+                    if (logMessage)
+                        console.log(chalk.blueBright(`${this.name} advanced their Destruction skill`));
+                }
+                break;
+            case "Restoration":
+                this.restorationSkillXP += value;
+                if (checkSkill(this.restorationSkill, this.restorationSkillXP, 0)) {
+                    this.restorationSkillXP -= this.restorationSkill * 50;
+                    this.restorationSkill++;
+                    if (logMessage)
+                        console.log(chalk.blueBright(`${this.name} advanced their Restoration skill`));
+                }
+                break;
+            case "Alteration":
+                this.alterationSkillXP += value;
+                if (checkSkill(this.alterationSkill, this.alterationSkillXP, 2)) {
+                    this.alterationSkillXP -= this.alterationSkill * 10;
+                    this.alterationSkill++;
+                    if (logMessage)
+                        console.log(chalk.blueBright(`${this.name} advanced their Alteration skill`));
+                }
+                break;
+            case "HeavyArmor":
+                this.heavyArmorSkillXP += value;
+                if (checkSkill(this.heavyArmorSkill, this.heavyArmorSkillXP, 1)) {
+                    this.heavyArmorSkillXP -= this.heavyArmorSkill * 25;
+                    this.heavyArmorSkill++;
+                    if (logMessage)
+                        console.log(chalk.blueBright(`${this.name} advanced their Heavy Armor skill`));
+                }
+                break;
+            case "Block":
+                this.blockSkillXP += value;
+                if (checkSkill(this.blockSkill, this.blockSkillXP, 1)) {
+                    this.blockSkillXP -= this.blockSkill * 25;
+                    this.blockSkill++;
+                    if (logMessage)
+                        console.log(chalk.blueBright(`${this.name} advanced their Block skill`));
+                }
+                break;
+            case "TwoHanded":
+                this.twoHandedSkillXP += value;
+                if (checkSkill(this.twoHandedSkill, this.twoHandedSkillXP, 0)) {
+                    this.twoHandedSkillXP -= this.twoHandedSkill * 50;
+                    this.twoHandedSkill++;
+                    if (logMessage)
+                        console.log(chalk.blueBright(`${this.name} advanced their Two Handed skill`));
+                }
+                break;
+            case "OneHanded":
+                this.oneHandedSkillXP += value;
+                if (checkSkill(this.oneHandedSkill, this.oneHandedSkillXP, 0)) {
+                    this.oneHandedSkillXP -= this.oneHandedSkill * 50;
+                    this.oneHandedSkill++;
+                    if (logMessage)
+                        console.log(chalk.blueBright(`${this.name} advanced their One Handed skill`));
+                }
+                break;
+            case "LightArmor":
+                this.lightArmorSkillXP += value;
+                if (checkSkill(this.lightArmorSkill, this.lightArmorSkillXP, 1)) {
+                    this.lightArmorSkillXP -= this.lightArmorSkill * 25;
+                    this.lightArmorSkill++;
+                    if (logMessage)
+                        console.log(chalk.blueBright(`${this.name} advanced their Light Armor skill`));
+                }
+                break;
+            case "Speech":
+                this.speechSkillXP += value;
+                if (checkSkill(this.speechSkill, this.speechSkillXP, 1)) {
+                    this.speechSkillXP -= this.speechSkill * 25;
+                    this.speechSkill++;
+                    if (logMessage)
+                        console.log(chalk.blueBright(`${this.name} advanced their Speech skill`));
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     //combat//
 
-    calculateMeleeDamage() {
-
+    getMeleeDamage() {
+        let baseDamage;
+        let cumulatedDamage = 0;
+        if (this.equipment.weapon) {
+            baseDamage = this.equipment.weapon.value * (1 + (this.equipment.weapon.getSubTypes()[0] === "TwoHanded" ?
+                                                            (this.twoHandedSkill / 100) :
+                                                            (this.oneHandedSkill / 100)));
+        } else {
+            baseDamage = Math.floor((1 + (this.characterLevel / 2)) * (1 + this.oneHandedSkill / 100));
+        }
+        cumulatedDamage += this.attackBonus;
+        cumulatedDamage += baseDamage;
+        if (Math.random() <= 0.1)
+            cumulatedDamage += Math.floor(baseDamage * 0.5);
+        if (this.equipment.weapon)
+            switch (this.equipment.weapon.getSubTypes()[0]) {
+                case "TwoHanded":
+                    cumulatedDamage += this.twoHandedSkill >= 25 ? Math.floor(baseDamage * 0.25) : 0;
+                    break;
+                case "OneHanded":
+                    cumulatedDamage += this.oneHandedSkill >= 25 ? Math.floor(baseDamage * 0.25) : 0;
+                    break;
+                default:
+                    break;
+            }
+        return cumulatedDamage;
     }
 
-    calculateMagicDamage() {
-
+    castSpell(school, id) {
+        const output = {success: false, value: 0};
+        let spell;
+        let manaCost;
+        switch (school) {
+            case "Destruction":
+                if (!this.isFighting)
+                    break;
+                spell = this.spells.destruction[id].clone();
+                output.value = Math.floor(spell.value * (1 + (this.destructionSkill / 100)));
+                manaCost = Math.ceil(spell.manaCost * (1 - (1 / this.destructionSkill >= 100 ? 100 : this.destructionSkill)));
+                break;
+            case "Restoration":
+                spell = this.spells.restoration[id].clone();
+                output.value = Math.floor(spell.value * (1 + (this.restorationSkill / 100)));
+                manaCost = Math.ceil(spell.manaCost * (1 - (1 / this.restorationSkill >= 100 ? 100 : this.restorationSkill)));
+                break;
+            case "Alteration":
+                spell = this.spells.alteration[id].clone();
+                output.value = spell.value;
+                manaCost = Math.ceil(spell.manaCost * (1 - (1 / this.alterationSkill >= 100 ? 100 : this.alterationSkill)));
+                break;
+            default:
+                break;
+        }
+        if (manaCost > this.mana)
+            return output;
+        output.success = true;
+        switch (spell.subtype) {
+            case "Health":
+                this.health = this.health + output.value >= this.maxHealth + this.healthBonus ? this.maxHealth + this.healthBonus : this.health + output.value;
+                break;
+            case "Stamina":
+                this.stamina = this.stamina + output.value >= this.maxStamina + this.staminaBonus ? this.maxStamina + this.staminaBonus : this.stamina + output.value;
+                break;
+            case "Armor":
+                this.effects.push(spell.effect.clone());
+                break;
+            default:
+                break;
+        }
+        this.advanceSkill(spell.school, output.value);
+        this.mana -= manaCost;
+        return output;
     }
 
-    calculateIncomingDamage(rawDamage, damageType) {
+    takeDamage(rawDamage, damageType) {
+        let finalDamage = rawDamage;
         const armorValue = this.getArmorValue();
+        if (damageType === "Magic")
+            finalDamage *= (1 - this.magicResistance);
+        else if (damageType === "Melee")
+            finalDamage *= (1 - this.meleeResistance);
+        else if (damageType !== "True")
+            finalDamage *= (1 - armorValue);
+        finalDamage = Math.floor(finalDamage);
+        if (finalDamage > 0) {
+            this.health -= finalDamage;
+            console.log(chalk.blueBright(`${this.name} takes ${chalk.red(finalDamage)} damage`));
+        } else {
+            console.log(chalk.blueBright(`${this.name} takes no damage`));
+        }
     }
 
     block() {
-        if (this.equipment.shield)
+        if (this.equipment.shield) {
             this.isBlocking = true;
+            if (this.equipment.shield.effect)
+                this.equipment.shield.effect.trigger(this);
+        }
     }
 
     stopBlocking() {
         this.isBlocking = false;
     }
+
+
 }

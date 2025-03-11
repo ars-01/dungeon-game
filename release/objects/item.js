@@ -1,6 +1,10 @@
 export class Item {
 
+    name;
 
+    value;
+    durability;
+    effect;
 
     getType() {
 
@@ -12,5 +16,9 @@ export class Item {
 
     clone() {
 
+    }
+
+    decreaseDurability() {
+        this.durability--;
     }
 }

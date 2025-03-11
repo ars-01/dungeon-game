@@ -6,6 +6,7 @@ export class Dungeon {
     level;
     root;
     playerPos;
+    enemies;
 
     constructor(root, level = 0) {
         this.level = level;
