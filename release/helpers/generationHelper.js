@@ -1,11 +1,12 @@
 import { Node } from "../objects/node.js";
 import {saveGraph} from "./dataHelper.js";
 import chalk from "chalk";
+import {overworldWalls, roomLayouts, walls} from "../resources/tables.js";
 
-const MAX_DEPTH = 5;
+const DEFAULT_MAX_DEPTH = 5;
 let id = 0;
 
-const expand = (node, generation = 1) => {
+const expand = (node, generation = 1, MAX_DEPTH = DEFAULT_MAX_DEPTH) => {
     const up = {
         pos: {
             x: node.x,
@@ -42,49 +43,28 @@ const expand = (node, generation = 1) => {
     if (up.probability) {
         const upNode = new Node(++id, up.pos.x, up.pos.y, node);
         node.addChild(upNode);
-        expand(upNode, generation + 1);
+        expand(upNode, generation + 1, MAX_DEPTH);
     }
     if (down.probability) {
         const downNode = new Node(++id, down.pos.x, down.pos.y, node);
         node.addChild(downNode);
-        expand(downNode, generation + 1);
+        expand(downNode, generation + 1, MAX_DEPTH);
     }
     if (left.probability) {
         const leftNode = new Node(++id, left.pos.x, left.pos.y, node);
         node.addChild(leftNode);
-        expand(leftNode, generation + 1);
+        expand(leftNode, generation + 1, MAX_DEPTH);
     }
     if (right.probability) {
         const rightNode = new Node(++id, right.pos.x, right.pos.y, node);
         node.addChild(rightNode);
-        expand(rightNode, generation + 1);
+        expand(rightNode, generation + 1, MAX_DEPTH);
     }
 }
 
-export const printLayout = (node, highlightPos = {x: 0, y: 0}) => {
-    const depth = node.getDepth();
-
-    let outputString = '';
-    for (let y = -depth; y < depth; y++) {
-        for (let x = -depth; x < depth; x++) {
-            if (node.hasChildAtPos({x: x, y: y}) || node.x === x && node.y === y) {
-                if (x === highlightPos.x && y === highlightPos.y)
-                    outputString += chalk.red(`+`);
-                else
-                    outputString += `+`;
-            } else {
-                outputString += " ";
-            }
-        }
-        outputString += '\n';
-    }
-
-    console.log(outputString);
-}
-
-export const generateNewTopology = () => {
+export const generateNewTopology = (maxDepth = DEFAULT_MAX_DEPTH) => {
     id = 0;
     const root = new Node(0, 0, 0);
-    expand(root);
+    expand(root, 1, maxDepth);
     return root;
 }

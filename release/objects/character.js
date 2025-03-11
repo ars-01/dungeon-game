@@ -1,12 +1,10 @@
 import {asBar, getColor} from "../resources/tables.js";
 import chalk from "chalk";
 import {checkSkill} from "../helpers/functionsHelper.js";
-import {Effect} from "./effect.js";
 
 export class Character {
 
     name;
-    level;
     isPlayer;
 
     maxHealth;
@@ -19,10 +17,10 @@ export class Character {
     mana;
     manaBonus = 0;
 
-    gold;
+    gold = 0;
     inventory = {
         weapons: [],
-        armor: [],
+        apparel: [],
         potions: [],
         misc: []
     };
@@ -44,7 +42,7 @@ export class Character {
     canAct = true;
     isOverencumbered = false;
     isInInventory = false;
-    currentInventoryPage;
+    currentInventoryPage = 0;
     isFighting = false;
     isBlocking = false;
     armorBonus = 0;
@@ -54,10 +52,12 @@ export class Character {
     canTrade;
 
     //skillLevels
-    characterLevel = 1;
+
+    characterLevel;
     characterLevelXP = 0;
 
     //mage
+
     destructionSkill = 1;
     destructionSkillXP = 0;
     restorationSkill = 1;
@@ -66,6 +66,7 @@ export class Character {
     alterationSkillXP = 0;
 
     //warrior
+
     heavyArmorSkill = 1;
     heavyArmorSkillXP = 0;
     blockSkill = 1;
@@ -76,14 +77,15 @@ export class Character {
     oneHandedSkillXP = 0;
 
     //thief
+
     lightArmorSkill = 1;
     lightArmorSkillXP = 0;
     speechSkill = 1;
     speechSkillXP = 0;
 
-    constructor(name, maxHealth, maxStamina, maxMana, level = 0, isPlayer = false, canTrade = false) {
+    constructor(name, maxHealth, maxStamina, maxMana, level = 1, isPlayer = false, canTrade = false) {
         this.name = name;
-        this.level = level;
+        this.characterLevel = level;
         this.isPlayer = isPlayer;
         this.maxHealth = maxHealth;
         this.health = maxHealth;
@@ -92,6 +94,64 @@ export class Character {
         this.mana = maxMana;
         this.maxMana = maxMana;
         this.canTrade = canTrade;
+    }
+
+    clone() {
+        const copy = new Character(this.name, this.maxHealth, this.maxStamina, this.maxMana, this.characterLevel, this.isPlayer, this.canTrade);
+        copy.healthBonus = this.healthBonus;
+        copy.staminaBonus = this.staminaBonus;
+        copy.manaBonus = this.manaBonus;
+        copy.gold = this.gold;
+
+        for (const weapon of this.inventory.weapons)
+            copy.inventory.weapons.push(weapon.clone());
+        for (const apparel of this.inventory.apparel)
+            copy.inventory.apparel.push(apparel.clone());
+        for (const potion of this.inventory.potions)
+            copy.inventory.potions.push(potion.clone());
+        for (const misc of this.inventory.misc)
+            copy.inventory.misc.push(misc.clone());
+
+        copy.equipment.weapon = this.equipment.weapon.clone();
+        copy.equipment.shield = this.equipment.shield.clone();
+        copy.equipment.head = this.equipment.head.clone();
+        copy.equipment.main = this.equipment.main.clone();
+        copy.equipment.arms = this.equipment.arms.clone();
+        copy.equipment.feet = this.equipment.feet.clone();
+
+        for (const destructionSpell of this.spells.destruction)
+            copy.spells.destruction.push(destructionSpell.clone());
+        for (const restorationSpell of this.spells.restoration)
+            copy.spells.restoration.push(restorationSpell.clone());
+        for (const alterationSpell of this.spells.alteration)
+            copy.spells.alteration.push(alterationSpell.clone());
+
+        for (const effect of this.effects)
+            copy.effects.push(effect.clone());
+
+        copy.characterLevel = this.characterLevel;
+        copy.characterLevelXP = this.characterLevelXP;
+
+        copy.destructionSkill = this.destructionSkill;
+        copy.destructionSkillXP = this.destructionSkillXP;
+        copy.restorationSkill = this.restorationSkill;
+        copy.restorationSkillXP = this.restorationSkillXP;
+        copy.alterationSkill = this.alterationSkill;
+        copy.restorationSkillXP = this.restorationSkillXP;
+        copy.heavyArmorSkill = this.heavyArmorSkill;
+        copy.heavyArmorSkillXP = this.heavyArmorSkillXP;
+        copy.blockSkill = this.blockSkill;
+        copy.blockSkillXP = this.blockSkillXP;
+        copy.twoHandedSkill = this.twoHandedSkill;
+        copy.twoHandedSkillXP = this.twoHandedSkillXP;
+        copy.oneHandedSkill = this.oneHandedSkill;
+        copy.oneHandedSkillXP = this.oneHandedSkillXP;
+        copy.lightArmorSkill = this.lightArmorSkill;
+        copy.lightArmorSkillXP = this.lightArmorSkillXP;
+        copy.speechSkill = this.speechSkill;
+        copy.speechSkillXP = this.speechSkillXP;
+
+        return copy;
     }
 
     //character information and inventory management//
@@ -119,7 +179,7 @@ export class Character {
                 });
                 break;
             case 2:
-                this.inventory.armor.forEach((item, index) => {
+                this.inventory.apparel.forEach((item, index) => {
                     console.log(chalk.hex(getColor(item.rarity))(`${index + 1}. ${item.name}`));
                 });
                 break;
@@ -144,7 +204,7 @@ export class Character {
         this.inventory.weapons.forEach((item, index) => {
             temp.push({name: item.name, rarity: item.rarity, type: 1, originalIndex: index});
         });
-        this.inventory.armor.forEach((item, index) => {
+        this.inventory.apparel.forEach((item, index) => {
             temp.push({name: item.name, rarity: item.rarity, type: 2, originalIndex: index});
         });
         this.inventory.potions.forEach((item, index) => {
@@ -156,6 +216,10 @@ export class Character {
 
         temp.sort((a, b) => {a.name.localeCompare(b.name);});
         return temp;
+    }
+
+    addGold(amount) {
+        this.gold += amount;
     }
 
     printEquipment(showName = true) {
@@ -222,9 +286,9 @@ export class Character {
                 this.inventory.weapons.push(item.clone());
                 this.inventory.weapons.sort((a, b) => {a.name.localeCompare(b.name);});
                 break;
-            case "Armor":
-                this.inventory.armor.push(item.clone());
-                this.inventory.armor.sort((a, b) => {a.name.localeCompare(b.name);});
+            case "Apparel":
+                this.inventory.apparel.push(item.clone());
+                this.inventory.apparel.sort((a, b) => {a.name.localeCompare(b.name);});
                 break;
             case "Potion":
                 this.inventory.potions.push(item.clone());
@@ -249,7 +313,7 @@ export class Character {
             case 1:
                 return this.inventory.weapons.splice(index, 1);
             case 2:
-                return this.inventory.armor.splice(index, 1);
+                return this.inventory.apparel.splice(index, 1);
             case 3:
                 return this.inventory.potions.splice(index, 1);
             case 4:
@@ -277,7 +341,7 @@ export class Character {
                 this.usePotion(index);
                 break;
             case 4:
-                console.log(chalk.blueBright("This item cannot be used. (message sent by character.useItem)"));
+                console.log(chalk.blueBright("This item cannot be used yet. (message sent by character.useItem)"));
                 break;
             default:
                 return;
@@ -389,7 +453,7 @@ export class Character {
         this.inventory.weapons.forEach((item) => {
             weight += item.weight;
         });
-        this.inventory.armor.forEach((item) => {
+        this.inventory.apparel.forEach((item) => {
             weight += item.weight;
         });
         this.inventory.potions.forEach((item) => {
@@ -440,7 +504,9 @@ export class Character {
     }
 
     addEffect(effect) {
-        this.effects.push(effect);
+        const newEffect = effect.clone();
+        newEffect.trigger();
+        this.effects.push(newEffect);
     }
 
     applyEffects() {
@@ -477,6 +543,8 @@ export class Character {
         this.manaBonus = 0;
         this.armorBonus = 0;
         this.attackBonus = 0;
+        this.magicResistance = 0;
+        this.meleeResistance = 0;
     }
 
     printEffects() {
@@ -503,6 +571,7 @@ export class Character {
                 if (checkSkill(this.destructionSkill, this.destructionSkillXP, 0)) {
                     this.destructionSkillXP -= this.destructionSkill * 50;
                     this.destructionSkill++;
+                    this.characterLevelXP++;
                     if (logMessage)
                         console.log(chalk.blueBright(`${this.name} advanced their Destruction skill`));
                 }
@@ -512,6 +581,7 @@ export class Character {
                 if (checkSkill(this.restorationSkill, this.restorationSkillXP, 0)) {
                     this.restorationSkillXP -= this.restorationSkill * 50;
                     this.restorationSkill++;
+                    this.characterLevelXP++;
                     if (logMessage)
                         console.log(chalk.blueBright(`${this.name} advanced their Restoration skill`));
                 }
@@ -521,6 +591,7 @@ export class Character {
                 if (checkSkill(this.alterationSkill, this.alterationSkillXP, 2)) {
                     this.alterationSkillXP -= this.alterationSkill * 10;
                     this.alterationSkill++;
+                    this.characterLevelXP++;
                     if (logMessage)
                         console.log(chalk.blueBright(`${this.name} advanced their Alteration skill`));
                 }
@@ -530,6 +601,7 @@ export class Character {
                 if (checkSkill(this.heavyArmorSkill, this.heavyArmorSkillXP, 1)) {
                     this.heavyArmorSkillXP -= this.heavyArmorSkill * 25;
                     this.heavyArmorSkill++;
+                    this.characterLevelXP++;
                     if (logMessage)
                         console.log(chalk.blueBright(`${this.name} advanced their Heavy Armor skill`));
                 }
@@ -539,6 +611,7 @@ export class Character {
                 if (checkSkill(this.blockSkill, this.blockSkillXP, 1)) {
                     this.blockSkillXP -= this.blockSkill * 25;
                     this.blockSkill++;
+                    this.characterLevelXP++;
                     if (logMessage)
                         console.log(chalk.blueBright(`${this.name} advanced their Block skill`));
                 }
@@ -548,6 +621,7 @@ export class Character {
                 if (checkSkill(this.twoHandedSkill, this.twoHandedSkillXP, 0)) {
                     this.twoHandedSkillXP -= this.twoHandedSkill * 50;
                     this.twoHandedSkill++;
+                    this.characterLevelXP++;
                     if (logMessage)
                         console.log(chalk.blueBright(`${this.name} advanced their Two Handed skill`));
                 }
@@ -557,6 +631,7 @@ export class Character {
                 if (checkSkill(this.oneHandedSkill, this.oneHandedSkillXP, 0)) {
                     this.oneHandedSkillXP -= this.oneHandedSkill * 50;
                     this.oneHandedSkill++;
+                    this.characterLevelXP++;
                     if (logMessage)
                         console.log(chalk.blueBright(`${this.name} advanced their One Handed skill`));
                 }
@@ -566,6 +641,7 @@ export class Character {
                 if (checkSkill(this.lightArmorSkill, this.lightArmorSkillXP, 1)) {
                     this.lightArmorSkillXP -= this.lightArmorSkill * 25;
                     this.lightArmorSkill++;
+                    this.characterLevelXP++;
                     if (logMessage)
                         console.log(chalk.blueBright(`${this.name} advanced their Light Armor skill`));
                 }
@@ -575,12 +651,45 @@ export class Character {
                 if (checkSkill(this.speechSkill, this.speechSkillXP, 1)) {
                     this.speechSkillXP -= this.speechSkill * 25;
                     this.speechSkill++;
+                    this.characterLevelXP++;
                     if (logMessage)
                         console.log(chalk.blueBright(`${this.name} advanced their Speech skill`));
                 }
                 break;
             default:
                 break;
+        }
+    }
+
+    levelUp() {
+        this.characterLevelXP = 0;
+        this.characterLevel++;
+        this.maxHealth += 10;
+        this.maxStamina += 10;
+        this.maxMana += 10;
+        this.health = this.maxHealth;
+        this.stamina = this.maxStamina;
+        this.mana = this.maxMana;
+    }
+
+    onStartTurn() {
+        this.applyEffects();
+    }
+
+    onEndTurn() {
+        this.health = (this.maxHealth + this.healthBonus) + 10 >= (this.maxHealth + this.healthBonus) ? (this.maxHealth + this.healthBonus) : this.health + 10;
+        this.stamina = (this.maxStamina + this.staminaBonus) + 10 >= (this.maxStamina + this.staminaBonus) ? (this.maxStamina + this.staminaBonus) : this.stamina + 10;
+        this.mana = (this.maxMana + this.manaBonus) + 10 >= (this.maxMana + this.manaBonus) ? (this.maxMana + this.manaBonus) : this.mana + 10;
+        this.resetBuffs();
+        if (this.characterLevelXP >= 10) {
+            this.levelUp();
+        }
+    }
+
+    rest(amountTurns = 1) {
+        for (let i = 0; i < amountTurns; i++) {
+            this.onStartTurn();
+            this.onEndTurn();
         }
     }
 
@@ -689,6 +798,4 @@ export class Character {
     stopBlocking() {
         this.isBlocking = false;
     }
-
-
 }

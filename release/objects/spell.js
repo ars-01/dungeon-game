@@ -1,6 +1,8 @@
 export class Spell {
     name;
+    //Destruction, Restoration, Alteration
     school;
+    //Fire, Ice, Shock, Health, Stamina, Armor, (...?)
     subtype;
     value;
     manaCost;

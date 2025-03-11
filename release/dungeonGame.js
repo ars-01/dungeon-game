@@ -1,5 +1,5 @@
 import {loadGraph, saveDungeon, saveGraph} from "./helpers/dataHelper.js";
-import {generateNewTopology, printLayout} from "./helpers/generationHelper.js";
+import {generateNewTopology, printOverworldChunk} from "./helpers/generationHelper.js";
 import readline from "readline";
 import {Dungeon} from "./objects/dungeon.js";
 

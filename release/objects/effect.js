@@ -1,6 +1,8 @@
 export class Effect {
     name;
+    //Health, Stamina, Mana, Armor, Damage, MagicResistance, MeleeResistance
     type;
+    //1 for bonus, -1 for damage
     subtype;
     timeToLive;
     magnitude;

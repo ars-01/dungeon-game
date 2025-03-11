@@ -42,6 +42,25 @@ export const roomLayouts = {
         "######").split(""),
 }
 
+export const overworldWalls = {
+    horizontalPassage: ("            ").split(""),
+    verticalPassage: ("  " +
+        "  " +
+        "  " +
+        "  " +
+        "  " +
+        "  ").split(""),
+    horizontalWall: ("############").split(""),
+    verticalWall: ("##" +
+        "##" +
+        "##" +
+        "##" +
+        "##" +
+        "##").split(""),
+    emptyCorner: ("    ").split(""),
+    fullCorner: ("####").split("")
+};
+
 export const spellEffects = {
     oakFlesh: new Spell("Oakflesh", "Alteration", "Armor", 40, 103,
         new Effect("Oakflesh", "Armor", 1, 12, 40)),
