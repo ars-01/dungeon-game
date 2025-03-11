@@ -5,6 +5,7 @@ import {checkSkill} from "../helpers/functionsHelper.js";
 export class Character {
 
     name;
+    pos = {x: 0, y: 0};
     isPlayer;
 
     maxHealth;
@@ -39,10 +40,14 @@ export class Character {
     }
     effects = [];
 
+    isParalyzed = false;
+
     canAct = true;
     isOverencumbered = false;
     isInInventory = false;
     currentInventoryPage = 0;
+    isInSpellbook = false;
+    currentSpellBookPage = 0;
     isFighting = false;
     isBlocking = false;
     armorBonus = 0;
@@ -83,8 +88,9 @@ export class Character {
     speechSkill = 1;
     speechSkillXP = 0;
 
-    constructor(name, maxHealth, maxStamina, maxMana, level = 1, isPlayer = false, canTrade = false) {
+    constructor(name, pos, maxHealth, maxStamina, maxMana, isPlayer = false, level = 1, canTrade = false) {
         this.name = name;
+        this.pos = pos;
         this.characterLevel = level;
         this.isPlayer = isPlayer;
         this.maxHealth = maxHealth;
@@ -97,7 +103,7 @@ export class Character {
     }
 
     clone() {
-        const copy = new Character(this.name, this.maxHealth, this.maxStamina, this.maxMana, this.characterLevel, this.isPlayer, this.canTrade);
+        const copy = new Character(this.name, this.pos, this.maxHealth, this.maxStamina, this.maxMana, this.characterLevel, this.isPlayer, this.canTrade);
         copy.healthBonus = this.healthBonus;
         copy.staminaBonus = this.staminaBonus;
         copy.manaBonus = this.manaBonus;
@@ -112,12 +118,12 @@ export class Character {
         for (const misc of this.inventory.misc)
             copy.inventory.misc.push(misc.clone());
 
-        copy.equipment.weapon = this.equipment.weapon.clone();
-        copy.equipment.shield = this.equipment.shield.clone();
-        copy.equipment.head = this.equipment.head.clone();
-        copy.equipment.main = this.equipment.main.clone();
-        copy.equipment.arms = this.equipment.arms.clone();
-        copy.equipment.feet = this.equipment.feet.clone();
+        copy.equipment.weapon = this.equipment.weapon ? this.equipment.weapon.clone() : null;
+        copy.equipment.shield = this.equipment.shield ? this.equipment.shield.clone() : null;
+        copy.equipment.head = this.equipment.head ? this.equipment.head.clone() : null;
+        copy.equipment.main = this.equipment.main ? this.equipment.main.clone() : null;
+        copy.equipment.arms = this.equipment.arms ? this.equipment.arms.clone() : null;
+        copy.equipment.feet = this.equipment.feet ? this.equipment.feet.clone() : null;
 
         for (const destructionSpell of this.spells.destruction)
             copy.spells.destruction.push(destructionSpell.clone());
@@ -152,6 +158,29 @@ export class Character {
         copy.speechSkillXP = this.speechSkillXP;
 
         return copy;
+    }
+
+    move(root, keyName) {
+        switch (keyName) {
+            case "up":
+                if (root.edgeExists(this.pos, {x: this.pos.x, y: this.pos.y - 1}))
+                    this.pos.y--;
+                break;
+            case "down":
+                if (root.edgeExists(this.pos, {x: this.pos.x, y: this.pos.y + 1}))
+                    this.pos.y++;
+                break;
+            case "left":
+                if (root.edgeExists(this.pos, {x: this.pos.x - 1, y: this.pos.y}))
+                    this.pos.x--;
+                break;
+            case "right":
+                if (root.edgeExists(this.pos, {x: this.pos.x + 1, y: this.pos.y}))
+                    this.pos.x++;
+                break;
+            default:
+                break;
+        }
     }
 
     //character information and inventory management//
@@ -258,11 +287,63 @@ export class Character {
             console.log("Feet: -");
     }
 
+    printSpellBook(page = 0, showName = true) {
+        if (showName)
+            console.log(`Spell Book of ${this.name}:\n`);
+        const tabs = ["All", "Destruction", "Restoration", "Alteration"];
+        let tabString = "";
+        for (let i = 0; i < tabs.length; i++) {
+            tabString += chalk.hex("#a0a0a0")(`"###[ ${i === page ? chalk.bold(tabs[i]) : tabs[i]} ]###`);
+        }
+        console.log(tabString);
+        this.currentSpellBookPage = page;
+        switch (page) {
+            case 0:
+                this.getCumulatedSpellBook().forEach((spell, index) => {
+                    console.log(chalk.hex("#ffffff")(`${index + 1}. ${spell.name}, ${spell.cost} mana`));
+                })
+                break;
+            case 1:
+                this.spells.destruction.forEach((spell, index) => {
+                    console.log(chalk.hex("#ffffff")(`${index + 1}. ${spell.name}, ${spell.manaCost} mana`));
+                });
+                break;
+            case 2:
+                this.spells.restoration.forEach((spell, index) => {
+                    console.log(chalk.hex("#ffffff")(`${index + 1}. ${spell.name}, ${spell.manaCost} mana`));
+                });
+                break;
+            case 3:
+                this.spells.alteration.forEach((spell, index) => {
+                    console.log(chalk.hex("#ffffff")(`${index + 1}. ${spell.name}, ${spell.manaCost} mana`));
+                });
+                break;
+            default:
+                break;
+        }
+        console.log(`\nEncumbrance: ${this.getEncumbrance()}/${this.getMaxEncumbrance()}`);
+    }
+
+    getCumulatedSpellBook() {
+        const temp = [];
+        this.spells.destruction.forEach((spell, index) => {
+            temp.push({name: spell.name, type: 1, originalIndex: index, cost: spell.manaCost});
+        });
+        this.spells.restoration.forEach((spell, index) => {
+            temp.push({name: spell.name, type: 2, originalIndex: index, cost: spell.manaCost});
+        });
+        this.spells.alteration.forEach((spell, index) => {
+            temp.push({name: spell.name, type: 3, originalIndex: index, cost: spell.manaCost});
+        });
+        temp.sort((a, b) => {a.name.localeCompare(b.name);});
+        return temp;
+    }
+
     printStatus() {
         console.log(chalk.blueBright(`----[ ${this.name} ]----\n`));
-        console.log("Health: " + chalk.red(asBar(this.health, this.maxHealth)));
+        console.log("Health:  " + chalk.red(asBar(this.health, this.maxHealth)));
         console.log("Stamina: " + chalk.green(asBar(this.stamina, this.maxStamina)));
-        console.log("Mana: " + chalk.blue(asBar(this.mana, this.maxMana)));
+        console.log("Mana:    " + chalk.blue(asBar(this.mana, this.maxMana)));
     }
 
     getArmorValue() {
@@ -281,7 +362,7 @@ export class Character {
     }
 
     addItemToInventory(item) {
-        switch (item.getType()) {
+        switch (item.type) {
             case "Weapon":
                 this.inventory.weapons.push(item.clone());
                 this.inventory.weapons.sort((a, b) => {a.name.localeCompare(b.name);});
@@ -341,7 +422,7 @@ export class Character {
                 this.usePotion(index);
                 break;
             case 4:
-                console.log(chalk.blueBright("This item cannot be used yet. (message sent by character.useItem)"));
+                console.log(chalk.redBright("This item cannot be used yet. (message sent by character.useItem)"));
                 break;
             default:
                 return;
@@ -404,44 +485,23 @@ export class Character {
     usePotion(index) {
         const item = this.removeItemFromInventory(index);
         switch (item.getSubTypes()[0]) {
-            case "Health":
+            case "Restore":
                 switch (item.getSubTypes()[1]) {
-                    case "Restore":
+                    case "Health":
                         this.health = this.health + item.value > this.maxHealth ? this.maxHealth : this.health + item.value;
                         break;
-                    case "Modify":
-                        this.maxHealth = this.maxHealth + item.value <= 0 ? 0 : this.maxHealth + item.value;
-                        this.health = this.health + item.value <= 0 ? 0 : this.health + item.value;
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case "Stamina":
-                switch (item.getSubTypes()[1]) {
-                    case "Restore":
+                    case "Stamina":
                         this.stamina = this.stamina + item.value > this.maxStamina ? this.maxStamina : this.stamina + item.value;
                         break;
-                    case "Modify":
-                        this.maxStamina = this.maxStamina + item.value <= 0 ? 0 : this.maxStamina + item.value;
-                        this.stamina = this.stamina + item.value <= 0 ? 0 : this.stamina + item.value;
+                    case "Mana":
+                        this.mana = this.mana + item.value > this.maxMana ? this.maxMana : this.mana + item.value;
                         break;
                     default:
                         break;
                 }
                 break;
-            case "Mana":
-                switch (item.getSubTypes()[1]) {
-                    case "Restore":
-                        this.mana = this.mana + item.value > this.maxMana ? this.maxMana : this.mana + item.value;
-                        break;
-                    case "Modify":
-                        this.maxMana = this.maxMana + item.value <= 0 ? 0 : this.maxMana + item.value;
-                        this.mana = this.mana + item.value <= 0 ? 0 : this.mana + item.value;
-                        break;
-                    default:
-                        break;
-                }
+            case "Augment":
+                this.effects.push(item.effect.clone());
                 break;
             default:
                 break;
@@ -723,25 +783,40 @@ export class Character {
         return cumulatedDamage;
     }
 
-    castSpell(school, id) {
-        const output = {success: false, value: 0};
+    castSpell(index, page = this.currentSpellBookPage ? this.currentSpellBookPage : -1) {
+        const output = {success: false, value: 0, effect: null};
+        if (page === -1 || !this.isInSpellbook)
+            return output;
         let spell;
+        switch (page) {
+            case 0:
+                const temp = this.getCumulatedSpellBook();
+                return this.castSpell(temp[index].originalIndex, temp[index].type);
+            case 1:
+                spell = this.spells.destruction[index].clone();
+                break;
+            case 2:
+                spell = this.spells.restoration[index].clone();
+                break;
+            case 3:
+                spell = this.spells.alteration[index].clone();
+                break;
+            default:
+                break;
+        }
         let manaCost;
-        switch (school) {
+        switch (spell.school) {
             case "Destruction":
                 if (!this.isFighting)
-                    break;
-                spell = this.spells.destruction[id].clone();
+                    return output;
                 output.value = Math.floor(spell.value * (1 + (this.destructionSkill / 100)));
                 manaCost = Math.ceil(spell.manaCost * (1 - (1 / this.destructionSkill >= 100 ? 100 : this.destructionSkill)));
                 break;
             case "Restoration":
-                spell = this.spells.restoration[id].clone();
                 output.value = Math.floor(spell.value * (1 + (this.restorationSkill / 100)));
                 manaCost = Math.ceil(spell.manaCost * (1 - (1 / this.restorationSkill >= 100 ? 100 : this.restorationSkill)));
                 break;
             case "Alteration":
-                spell = this.spells.alteration[id].clone();
                 output.value = spell.value;
                 manaCost = Math.ceil(spell.manaCost * (1 - (1 / this.alterationSkill >= 100 ? 100 : this.alterationSkill)));
                 break;
@@ -760,6 +835,9 @@ export class Character {
                 break;
             case "Armor":
                 this.effects.push(spell.effect.clone());
+                break;
+            case "Paralysis":
+                output.effect = spell.effect.clone();
                 break;
             default:
                 break;

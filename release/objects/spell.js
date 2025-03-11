@@ -18,6 +18,8 @@ export class Spell {
     }
 
     clone() {
-        return new Spell(this.name, this.school, this.subtype, this.value, this.manaCost, this.effect.clone());
+        const copy =  new Spell(this.name, this.school, this.subtype, this.value, this.manaCost);
+        copy.effect = this.effect ? this.effect : null;
+        return copy;
     }
 }

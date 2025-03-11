@@ -48,6 +48,12 @@ export class Effect {
                 character.meleeResistance += this.magnitude * this.subtype;
                 character.meleeResistance = character.meleeResistance >= 1 ? 1 : character.meleeResistance;
                 break;
+            case "Paralysis":
+                if (this.subtype !== 0)
+                    character.isParalyzed = true;
+                else
+                    character.isParalysed = false;
+                break;
             default:
                 break;
 

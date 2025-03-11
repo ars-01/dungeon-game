@@ -98,5 +98,5 @@ export const printOverworldChunk = (node, highlightPos = {x: 0, y: 0}) => {
 
 }
 
-const overworld = generateNewTopology(10);
+const overworld = generateNewTopology(7);
 printOverworldChunk(overworld);

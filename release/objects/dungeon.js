@@ -4,9 +4,10 @@ import chalk from "chalk";
 export class Dungeon {
 
     level;
+    //also the entrance
     root;
     playerPos;
-    enemies;
+    enemies = [];
 
     constructor(root, level = 0) {
         this.level = level;
@@ -27,7 +28,7 @@ export class Dungeon {
                     wallRight: this.root.edgeExists(pos, {x: x + 1, y: y}) ? walls.verticalHallwayRight : walls.verticalWall,
                     innerSpace: this.root.hasChildAtPos(pos) || this.root.x === pos.x && this.root.y === pos.y ? roomLayouts.empty : roomLayouts.filled,
                 }
-                const color = (x === highlightPos.x && y === highlightPos.y) ? "#ff0000" : "#ffffff";
+                const color = (x === highlightPos.x && y === highlightPos.y) ? "#ff0000" : "#969696";
                 for (let i = 0; i < 10; i++) {
                     roomRow[0] += chalk.hex(color)(layout.wallUp[i]);
                     roomRow[1] += chalk.hex(color)(layout.wallUp[i + 10]);
@@ -86,6 +87,6 @@ export class Dungeon {
 
     getSimplifiedCopy() {
         const root = this.root.getSubGraphArray();
-        return {level: this.level, root: root, playerPos: this.playerPos};
+        return {level: this.level, root: root, playerPos: this.playerPos, enemies: this.enemies};
     }
 }
