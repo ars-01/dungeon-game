@@ -1,3 +1,7 @@
+import promptSync from "prompt-sync";
+
+const prompt = promptSync();
+
 export const checkSkill = (skillLevel, skillXP, skillXPClass) => {
     switch (skillXPClass) {
         case 0:
@@ -16,4 +20,14 @@ export const checkSkill = (skillLevel, skillXP, skillXPClass) => {
             break;
     }
     return false;
+}
+
+export const getId = (min, max) => {
+    let id = -100;
+    while (id < min || isNaN(id) || id > max) {
+        id = parseInt(prompt(`Enter an integer between ${min} and ${max}: `));
+        if (id === min - 1)
+            return -100;
+    }
+    return id - 1;
 }

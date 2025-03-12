@@ -45,6 +45,7 @@ export class Character {
 
     canAct = true;
     isOverencumbered = false;
+    isTrading = false;
     isInInventory = false;
     currentInventoryPage = 0;
     isInSpellbook = false;
@@ -136,6 +137,23 @@ export class Character {
         for (const effect of this.effects)
             copy.effects.push(effect.clone());
 
+        copy.isParalyzed = this.isParalyzed;
+
+        copy.canAct = this.canAct;
+        copy.isOverencumbered = this.isOverencumbered;
+        copy.isTrading = this.isTrading;
+        copy.isInInventory = this.isInInventory;
+        copy.currentInventoryPage = this.currentInventoryPage;
+        copy.isInSpellbook = this.isInSpellbook;
+        copy.currentSpellBookPage = this.currentSpellBookPage;
+        copy.isFighting = this.isFighting;
+        copy.isBlocking = this.isBlocking;
+        copy.armorBonus = this.armorBonus;
+        copy.attackBonus = this.attackBonus;
+        copy.magicResistance = this.magicResistance;
+        copy.meleeResistance = this.meleeResistance;
+        copy.canTrade = this.canTrade;
+
         copy.characterLevel = this.characterLevel;
         copy.characterLevelXP = this.characterLevelXP;
 
@@ -186,17 +204,17 @@ export class Character {
 
     //character information and inventory management//
 
-    printInventory(page = 0, showName = true) {
+    printInventory(page = this.currentInventoryPage, showName = true) {
+        page = page < 0 ? page + 5 : page % 5;
+        this.currentInventoryPage = page;
         if (showName)
             console.log(`Inventory of ${this.name}:\n`);
-        console.log("Gold: " + chalk.hex("#ddd700")(this.gold) + "\n");
         const tabs = ["All", "Weapons", "Apparel", "Potions", "Misc"];
         let tabString = "";
         for (let i = 0; i < tabs.length; i++) {
-            tabString += chalk.hex("#a0a0a0")(`"###[ ${i === page ? chalk.bold(tabs[i]) : tabs[i]} ]###`);
+            tabString += chalk.hex("#a0a0a0")(`████ ${i === page ? chalk.green(tabs[i]) : tabs[i]} ████`);
         }
-        console.log(tabString);
-        this.currentInventoryPage = page;
+        console.log(tabString + "\n");
         switch (page) {
             case 0:
                 this.getCumulatedInventory().forEach((item, index) => {
@@ -226,25 +244,31 @@ export class Character {
             default:
                 break;
         }
-        console.log(`\nEncumbrance: ${this.getEncumbrance()}/${this.getMaxEncumbrance()}`);
+        console.log(chalk.hex("#a0a0a0")("\n██████████████████████████████████████████████████████████████████████████████"));
+        console.log(`\nEncumbrance: ${this.getEncumbrance()}/${this.getMaxEncumbrance()}   `
+            + "Gold: " + chalk.hex("#ddd700")(this.gold) + "\n");
     }
 
     getCumulatedInventory() {
         const temp = [];
-        this.inventory.weapons.forEach((item, index) => {
+        for (let index = 0; index < this.inventory.weapons.length; index++) {
+            const item = this.inventory.weapons[index].clone();
             temp.push({name: item.name, rarity: item.rarity, type: 1, originalIndex: index});
-        });
-        this.inventory.apparel.forEach((item, index) => {
+        }
+        for (let index = 0; index < this.inventory.apparel.length; index++) {
+            const item = this.inventory.apparel[index].clone();
             temp.push({name: item.name, rarity: item.rarity, type: 2, originalIndex: index});
-        });
-        this.inventory.potions.forEach((item, index) => {
+        }
+        for (let index = 0; index < this.inventory.potions.length; index++) {
+            const item = this.inventory.potions[index].clone();
             temp.push({name: item.name, rarity: item.rarity, type: 3, originalIndex: index});
-        });
-        this.inventory.misc.forEach((item, index) => {
+        }
+        for (let index = 0; index < this.inventory.misc.length; index++) {
+            const item = this.inventory.misc[index].clone();
             temp.push({name: item.name, rarity: item.rarity, type: 4, originalIndex: index});
-        });
+        }
 
-        temp.sort((a, b) => {a.name.localeCompare(b.name);});
+        temp.sort((a, b) => {b.name.localeCompare(a.name);});
         return temp;
     }
 
@@ -288,15 +312,17 @@ export class Character {
             console.log("Feet: -");
     }
 
-    printSpellBook(page = 0, showName = true) {
+    printSpellBook(page = this.currentSpellBookPage, showName = true) {
+        page = page < 0 ? page + 4 : page % 4;
+        this.currentSpellBookPage = page;
         if (showName)
             console.log(`Spell Book of ${this.name}:\n`);
         const tabs = ["All", "Destruction", "Restoration", "Alteration"];
         let tabString = "";
         for (let i = 0; i < tabs.length; i++) {
-            tabString += chalk.hex("#a0a0a0")(`"###[ ${i === page ? chalk.bold(tabs[i]) : tabs[i]} ]###`);
+            tabString += chalk.hex("#a0a0a0")(`"████ ${i === page ? chalk.green(tabs[i]) : tabs[i]} ████`);
         }
-        console.log(tabString);
+        console.log(tabString + "\n");
         this.currentSpellBookPage = page;
         switch (page) {
             case 0:
@@ -322,7 +348,7 @@ export class Character {
             default:
                 break;
         }
-        console.log(`\nEncumbrance: ${this.getEncumbrance()}/${this.getMaxEncumbrance()}`);
+        console.log(chalk.hex("#a0a0a0")("\n█████████████████████████████████████████████████████████████████████"));
     }
 
     getCumulatedSpellBook() {
@@ -336,7 +362,7 @@ export class Character {
         this.spells.alteration.forEach((spell, index) => {
             temp.push({name: spell.name, type: 3, originalIndex: index, cost: spell.manaCost});
         });
-        temp.sort((a, b) => {a.name.localeCompare(b.name);});
+        temp.sort((a, b) => {b.name.localeCompare(a.name);});
         return temp;
     }
 
@@ -366,19 +392,19 @@ export class Character {
         switch (item.type) {
             case "Weapon":
                 this.inventory.weapons.push(item.clone());
-                this.inventory.weapons.sort((a, b) => {a.name.localeCompare(b.name);});
+                this.inventory.weapons.sort((a, b) => {b.name.localeCompare(a.name);});
                 break;
             case "Apparel":
                 this.inventory.apparel.push(item.clone());
-                this.inventory.apparel.sort((a, b) => {a.name.localeCompare(b.name);});
+                this.inventory.apparel.sort((a, b) => {b.name.localeCompare(a.name);});
                 break;
             case "Potion":
                 this.inventory.potions.push(item.clone());
-                this.inventory.potions.sort((a, b) => {a.name.localeCompare(b.name);});
+                this.inventory.potions.sort((a, b) => {b.name.localeCompare(a.name);});
                 break;
             case "Misc":
                 this.inventory.misc.push(item.clone());
-                this.inventory.misc.sort((a, b) => {a.name.localeCompare(b.name);});
+                this.inventory.misc.sort((a, b) => {b.name.localeCompare(a.name);});
                 break;
             default:
                 break;
@@ -390,6 +416,7 @@ export class Character {
             return;
         switch (page) {
             case 0:
+                console.log(index);
                 const temp = this.getCumulatedInventory();
                 return this.removeItemFromInventory(temp[index].originalIndex, temp[index].type);
             case 1:
@@ -402,6 +429,69 @@ export class Character {
                 return this.inventory.misc.splice(index, 1);
             default:
                 return;
+        }
+    }
+
+    itemInfo(index, page = this.currentInventoryPage) {
+        if (!this.isInInventory)
+            return;
+        switch (page) {
+            case 0:
+                const temp = this.getCumulatedInventory();
+                console.log(index);
+                this.itemInfo(temp[index].originalIndex, temp[index].type);
+                break;
+            case 1:
+                if (index < this.inventory.weapons.length)
+                    this.inventory.weapons[index].detailedInfo();
+                break;
+            case 2:
+                if (index < this.inventory.apparel.length)
+                    this.inventory.apparel[index].detailedInfo();
+                break;
+            case 3:
+                if (index < this.inventory.potions.length)
+                    this.inventory.potions[index].detailedInfo();
+                break;
+            case 4:
+                if (index < this.inventory.misc.length)
+                    this.inventory.misc[index].detailedInfo();
+                break;
+            default:
+                return;
+        }
+
+    }
+
+    getInventoryPageLength(page) {
+        switch (page) {
+            case 0:
+                return this.getCumulatedInventory().length;
+            case 1:
+                return this.inventory.weapons.length;
+            case 2:
+                return this.inventory.apparel.length;
+            case 3:
+                return this.inventory.potions.length;
+            case 4:
+                return this.inventory.misc.length;
+            default:
+                return 0;
+        }
+    }
+
+    getSpellBookPageLength(page) {
+        switch (page) {
+            case 0:
+                return this.getCumulatedSpellBook().length;
+            case 1:
+                return this.spells.destruction.length;
+            case 2:
+                return this.spells.restoration.length;
+            case 3:
+                return this.spells.alteration.length;
+            default:
+                return 0;
         }
     }
 
@@ -727,17 +817,17 @@ export class Character {
             case "Destruction":
                 if (!this.spells.destruction.includes(spell))
                     this.spells.destruction.push(spell.clone());
-                this.spells.destruction.sort((a, b) => a.name.localeCompare(b.name));
+                this.spells.destruction.sort((a, b) => b.name.localeCompare(a.name));
                 break;
             case "Restoration":
                 if (!this.spells.restoration.includes(spell))
                     this.spells.restoration.push(spell.clone());
-                this.spells.restoration.sort((a, b) => a.name.localeCompare(b.name));
+                this.spells.restoration.sort((a, b) => b.name.localeCompare(a.name));
                 break;
             case "Alteration":
                 if (!this.spells.alteration.includes(spell))
                     this.spells.alteration.push(spell.clone());
-                this.spells.alteration.sort((a, b) => a.name.localeCompare(b.name));
+                this.spells.alteration.sort((a, b) => b.name.localeCompare(a.name));
                 break;
             default:
                 break;
@@ -760,9 +850,15 @@ export class Character {
     }
 
     onEndTurn() {
-        this.health = (this.maxHealth + this.healthBonus) + 10 >= (this.maxHealth + this.healthBonus) ? (this.maxHealth + this.healthBonus) : this.health + 10;
-        this.stamina = (this.maxStamina + this.staminaBonus) + 10 >= (this.maxStamina + this.staminaBonus) ? (this.maxStamina + this.staminaBonus) : this.stamina + 10;
-        this.mana = (this.maxMana + this.manaBonus) + 10 >= (this.maxMana + this.manaBonus) ? (this.maxMana + this.manaBonus) : this.mana + 10;
+        this.health  += 10;
+        if (this.health > this.maxHealth + this.healthBonus)
+            this.health = this.maxHealth + this.healthBonus;
+        this.stamina += 10;
+        if (this.stamina > this.maxStamina + this.staminaBonus)
+            this.stamina = (this.maxStamina + this.staminaBonus);
+        this.mana += 10;
+        if (this.mana > (this.maxMana + this.manaBonus))
+            this.mana = (this.maxMana + this.manaBonus);
         this.resetBuffs();
         if (this.characterLevelXP >= 10) {
             this.levelUp();
@@ -793,12 +889,14 @@ export class Character {
         if (Math.random() <= 0.1)
             cumulatedDamage += Math.floor(baseDamage * 0.5);
         if (this.equipment.weapon)
-            switch (this.equipment.weapon.getSubTypes()[0]) {
+            switch (this.equipment.weapon.getSubTypes()[1]) {
                 case "TwoHanded":
                     cumulatedDamage += this.twoHandedSkill >= 25 ? Math.floor(baseDamage * 0.25) : 0;
+                    this.advanceSkill("TwoHanded", cumulatedDamage);
                     break;
                 case "OneHanded":
                     cumulatedDamage += this.oneHandedSkill >= 25 ? Math.floor(baseDamage * 0.25) : 0;
+                    this.advanceSkill("OneHanded", cumulatedDamage);
                     break;
                 default:
                     break;
@@ -897,6 +995,8 @@ export class Character {
         } else {
             console.log(chalk.blueBright(`${this.name} takes no damage`));
         }
+        //TODO: this.advanceSkill(this.getArmorType(), rawDamage);
+        //TODO: if (this.blocking) this.advanceSkill("Block", rawDamage);
     }
 
     block() {

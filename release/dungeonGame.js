@@ -3,6 +3,8 @@ import {generateNewTopology} from "./helpers/generationHelper.js";
 import readline from "readline";
 import {Dungeon} from "./objects/dungeon.js";
 import {Character} from "./objects/character.js";
+import {playerAction} from "./helpers/playerActionHelper.js";
+import {items} from "./resources/tables.js";
 
 readline.emitKeypressEvents(process.stdin);
 if (process.stdin.isTTY)
@@ -12,40 +14,49 @@ let root = generateNewTopology();
 let dungeon = new Dungeon(root);
 const player = new Character("Player", {x: 0, y: 0}, 100, 100, 100, true);
 dungeon.print(player.pos);
+console.log("\x1b[?25l");
+
+player.addItemToInventory(items.common[0].clone());
+player.addItemToInventory(items.rare[0].clone());
+player.addItemToInventory(items.mythic[11].clone());
 
 process.stdin.on('keypress', async (chunk, key) => {
     if (!key) return;
 
     console.clear();
-    if (key.name === 'q') {
+    console.log("\x1b[?25l");
+    if (key.name === 'q' && !player.isInInventory && !player.isInSpellbook && !player.isFighting && !player.isTrading) {
         process.exit();
     }
 
     if(key.name === 'n') {
         root = generateNewTopology();
-        player.pos = {x: 0, y: 0};
         dungeon = new Dungeon(root);
+        player.pos = {x: dungeon.root.x, y: dungeon.root.y};
     }
     if (key.name === "f5") {
         await saveDungeon(dungeon);
         await savePlayer(player);
-        console.log("saved graph");
+        console.log("saved game");
     }
     if (key.name === "f9") {
         dungeon = await loadDungeon();
         player.pos = dungeon.playerPos;
-        console.log("loaded graph");
+        console.log("loaded game");
     }
-    if (key.name === "p") {
-        console.log(dungeon.root.printSubGraph());
+    if (key.name === "i" && !player.isInSpellbook) {
+        player.isInInventory = true;
+    }
+    if (key.name === "o" && !player.isInInventory) {
+        player.isInSpellbook = true;
     }
 
-    movePlayer(key.name);
-    dungeon.print(player.pos);
+    playerAction(player, dungeon, key.name);
+    if (!player.isInInventory && !player.isInSpellbook && !player.isTrading && !player.isFighting) {
+        dungeon.print(player.pos);
+    }
+
     player.printStatus();
 
 });
 
-const movePlayer = (keyName) => {
-    player.move(dungeon.root, keyName);
-}

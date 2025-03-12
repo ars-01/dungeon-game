@@ -25,7 +25,6 @@ export const printOverworldChunk = (node, highlightPos = {x: 0, y: 0}) => {
             }
             const color = (x === highlightPos.x && y === highlightPos.y) ? "#ff0000" : "#707070";
             for (let i = 0; i < 10; i++) {
-
                 if (i < 2) {
                     roomRow[0] += chalk.hex(color)(layout.cornerUpLeft[i]);
                     roomRow[1] += chalk.hex(color)(layout.cornerUpLeft[i + 2]);

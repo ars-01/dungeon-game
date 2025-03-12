@@ -5,6 +5,7 @@ import {Character} from "../objects/character.js";
 import {Effect} from "../objects/effect.js";
 import {Item} from "../objects/item.js";
 import {Spell} from "../objects/spell.js";
+import {Tile} from "../objects/tile.js";
 
 //save data
 
@@ -18,7 +19,7 @@ export const saveGraph = async (root) => {
 }
 
 export const saveDungeon = async (dungeon) => {
-    const dungeonJSON = JSON.stringify(dungeon.getSimplifiedCopy());
+    const dungeonJSON = JSON.stringify(dungeon.getSimplifiedDungeon(), null, 4);
     await fs.writeFile(`./resources/dungeon.json`, dungeonJSON, function (err) {
         if (err) {
             console.error(err);
@@ -27,7 +28,7 @@ export const saveDungeon = async (dungeon) => {
 }
 
 export const savePlayer = async (player) => {
-    const playerJSON = JSON.stringify(player.clone());
+    const playerJSON = JSON.stringify(player.clone(), null, 4);
     await fs.writeFile(`./resources/player.json`, playerJSON, function (err) {
         if (err) {
             console.error(err);
@@ -77,8 +78,13 @@ const dungeonFromJSON = (data) => {
     const dungeon = new Dungeon(root, data.level);
     dungeon.root = root;
     dungeon.playerPos = data.playerPos;
+    dungeon.enemies = [];
     for (const enemy of data.enemies) {
         dungeon.enemies.push(characterFromJSON(enemy));
+    }
+    dungeon.tiles = [];
+    for (const tile of data.tiles) {
+        dungeon.tiles.push(tileFromJSON(tile));
     }
     return dungeon;
 }
@@ -115,8 +121,25 @@ const characterFromJSON = (data) => {
         character.spells.alteration.push(spellFromJSON(alterationSpell));
 
     for (const effect of data.effects)
-        character.effects.push(effect.clone());
+        character.effects.push(effectFromJSON(effect));
 
+    character.isParalyzed = data.isParalyzed;
+
+    character.canAct = data.canAct;
+    character.isOverencumbered = data.isOverencumbered;
+    character.isTrading = data.isTrading;
+    character.isInInventory = data.isInInventory;
+    character.currentInventoryPage = data.currentInventoryPage;
+    character.isInSpellbook = data.isInSpellbook;
+    character.currentSpellBookPage = data.currentSpellBookPage;
+    character.isFighting = data.isFighting;
+    character.isBlocking = data.isBlocking;
+    character.armorBonus = data.armorBonus;
+    character.attackBonus = data.attackBonus;
+    character.magicResistance = data.magicResistance;
+    character.meleeResistance = data.meleeResistance;
+    character.canTrade = data.canTrade;
+    
     character.characterLevel = data.characterLevel;
     character.characterLevelXP = data.characterLevelXP;
 
@@ -142,6 +165,17 @@ const characterFromJSON = (data) => {
     return character;
 }
 
+const tileFromJSON = (data) => {
+    const tile = new Tile(data.pos);
+    for (const item of data.items) {
+        tile.items.push(itemFromJSON(item));
+    }
+    tile.gold = data.gold;
+    tile.isVisible = data.isVisible;
+    tile.uncovered = data.uncovered;
+    return tile;
+}
+
 const effectFromJSON = (data) => {
     if (data)
         return new Effect(data.name, data.type, data.subtype, data.timeToLive, data.magnitude);
@@ -150,11 +184,8 @@ const effectFromJSON = (data) => {
 }
 
 const itemFromJSON = (data) => {
-    const item = new Item(data.name, data.type, data.subtypes, data.weight, data.value, data.durability, data.sellValue, effectFromJSON(data.effect));
-    item.subtypes = [];
-    for (const subtype of data.subtypes) {
-        item.subtypes.push(subtype);
-    }
+    const item = new Item(data.name, data.type, data.subtypes, data.durability, data.value, data.weight, data.rarity, data.sellValue, effectFromJSON(data.effect));
+    item.subtipes = data.subtypes;
     return item;
 }
 
