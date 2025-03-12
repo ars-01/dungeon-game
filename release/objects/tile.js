@@ -1,4 +1,5 @@
-import {roomLayouts} from "../resources/tables.js";
+import {getColor, roomLayouts} from "../resources/tables.js";
+import chalk from "chalk";
 
 export class Tile {
     pos;
@@ -47,5 +48,17 @@ export class Tile {
             else
                 return roomLayouts.filled;
         }
+    }
+
+    printItems() {
+        console.log(chalk.blueBright("You have found the following items: \n"));
+        for (let i = 0; i < this.items.length; i++) {
+            console.log(chalk.hex(getColor(this.items[i].rarity))(`${i + 1}. ${this.items[i].name}`));
+        }
+        console.log(chalk.blueBright("\nEnter the Index of an Item to pick it up, or enter 0 to cancel\n"));
+    }
+
+    removeItem(index) {
+        return this.items.splice(index, 1)[0];
     }
 }

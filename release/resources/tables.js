@@ -41,6 +41,20 @@ export const asBar = (value, maxValue) => {
     return outputString + "╠";
 }
 
+export const getRandomItem = (level) => {
+    if (level <= 5) {
+        return items.common[Math.floor(Math.random() * items.common.length)].clone();
+    } else if (level <= 10) {
+        return Math.random() < 0.5 ? items.uncommon[Math.floor(Math.random() * items.uncommon.length)].clone() : items.common[Math.floor(Math.random() * items.common.length)].clone();
+    } else if (level <= 15) {
+        return Math.random() < 0.5 ? items.rare[Math.floor(Math.random() * items.rare.length)].clone() : items.uncommon[Math.floor(Math.random() * items.uncommon.length)].clone();
+    } else if (level <= 20) {
+        return Math.random() < 0.5 ? items.mythic[Math.floor(Math.random() * items.mythic.length)].clone() : items.rare[Math.floor(Math.random() * items.rare.length)].clone();
+    } else {
+        return items.mythic[Math.floor(Math.random() * items.mythic.length)].clone();
+    }
+}
+
 export const walls = {
     horizontalHallwayDown: ("██▓█  ▓█▓█" +
                             "▓██▒  ░██▓").split(""),
@@ -236,8 +250,10 @@ export const items = {
 
         //Potions
         new Item("Potion of Minor Healing", "Potion", "Restore|Health", 1, 25, 0.25,"Common", 17),
-        new Item("Potion of Minor Increase Health", "Potion", "Augment|Health", 1, 5, 0.25,"Common", 23),
-        new Item("Potion of Minor Increase Stamina", "Potion", "Augment|Stamina", 1, 5, 0.25,"Common", 23),
+        new Item("Potion of Minor Increase Health", "Potion", "Augment|Health", 1, 5, 0.25,"Common", 23,
+            new Effect("Increased Health", "Health", 1, 6, 10)),
+        new Item("Potion of Minor Increase Stamina", "Potion", "Augment|Stamina", 1, 5, 0.25,"Common", 23,
+            new Effect("Increased Stamina", "Stamina", 1, 6, 10)),
     ],
     uncommon: [
         //Weapons
@@ -281,8 +297,10 @@ export const items = {
 
         //Potions
         new Item("Potion of Healing", "Potion", "Restore|Health", 1, 50, 0.25,"Uncommon", 36),
-        new Item("Potion of Increase Health", "Potion", "Augment|Health", 1, 10, 0.25,"Uncommon", 41),
-        new Item("Potion of Increase Stamina", "Potion", "Augment|Stamina", 1, 10, 0.25,"Uncommon", 41),
+        new Item("Potion of Increase Health", "Potion", "Augment|Health", 1, 10, 0.25,"Uncommon", 41,
+            new Effect("Increased Health", "Health", 1, 6, 20)),
+        new Item("Potion of Increase Stamina", "Potion", "Augment|Stamina", 1, 10, 0.25,"Uncommon", 41,
+            new Effect("Increased Stamina", "Stamina", 1, 6, 20)),
 
     ],
     rare: [
@@ -327,8 +345,10 @@ export const items = {
 
         //Potions
         new Item("Potion of Vigorous Healing", "Potion", "Restore|Health", 1, 75, 0.25,"Rare", 79),
-        new Item("Potion of Vigorous Increase Health", "Potion", "Augment|Health", 1, 15, 0.25,"Rare", 85),
-        new Item("Potion of Vigorous Increase Stamina", "Potion", "Augment|Stamina", 1, 15, 0.25,"Rare", 85),
+        new Item("Potion of Vigorous Increase Health", "Potion", "Augment|Health", 1, 15, 0.25,"Rare", 85,
+            new Effect("Increased Health", "Health", 1, 6, 30)),
+        new Item("Potion of Vigorous Increase Stamina", "Potion", "Augment|Stamina", 1, 15, 0.25,"Rare", 85,
+            new Effect("Increased Stamina", "Stamina", 1, 6, 30)),
     ],
     mythic: [
         //Weapons
@@ -363,8 +383,10 @@ export const items = {
 
         //Potions
         new Item("Potion of Ultimate Healing", "Potion", "Restore|Health", 1, 100, 0.25,"Mythic", 251),
-        new Item("Potion of Ultimate Increase Health", "Potion", "Augment|Health", 1, 20, 0.25,"Mythic", 275),
-        new Item("Potion of Ultimate Increase Stamina", "Potion", "Augment|Stamina", 1, 20, 0.25,"Mythic", 275),
+        new Item("Potion of Ultimate Increase Health", "Potion", "Augment|Health", 1, 20, 0.25,"Mythic", 275,
+            new Effect("Increased Health", "Health", 1, 6, 30)),
+        new Item("Potion of Ultimate Increase Stamina", "Potion", "Augment|Stamina", 1, 20, 0.25,"Mythic", 275,
+            new Effect("Increased Stamina", "Stamina", 1, 6, 50)),
     ]
 };
 

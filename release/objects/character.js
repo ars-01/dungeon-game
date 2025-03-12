@@ -313,14 +313,14 @@ export class Character {
     }
 
     printSpellBook(page = this.currentSpellBookPage, showName = true) {
-        page = page < 0 ? page + 4 : page % 4;
+        page = page < 0 ? page + 5 : page % 5;
         this.currentSpellBookPage = page;
         if (showName)
             console.log(`Spell Book of ${this.name}:\n`);
-        const tabs = ["All", "Destruction", "Restoration", "Alteration"];
+        const tabs = ["All", "Destruction", "Restoration", "Alteration", "Effects"];
         let tabString = "";
         for (let i = 0; i < tabs.length; i++) {
-            tabString += chalk.hex("#a0a0a0")(`"████ ${i === page ? chalk.green(tabs[i]) : tabs[i]} ████`);
+            tabString += chalk.hex("#a0a0a0")(`████ ${i === page ? chalk.green(tabs[i]) : tabs[i]} ████`);
         }
         console.log(tabString + "\n");
         this.currentSpellBookPage = page;
@@ -345,10 +345,15 @@ export class Character {
                     console.log(chalk.hex("#ffffff")(`${index + 1}. ${spell.name}, ${spell.manaCost} mana`));
                 });
                 break;
+            case 4:
+                for (const effect of this.effects) {
+                    console.log(chalk.hex("#ffffff")(effect));
+                }
+                break;
             default:
                 break;
         }
-        console.log(chalk.hex("#a0a0a0")("\n█████████████████████████████████████████████████████████████████████"));
+        console.log(chalk.hex("#a0a0a0")("\n████████████████████████████████████████████████████████████████████████████████████████████"));
     }
 
     getCumulatedSpellBook() {
@@ -411,7 +416,7 @@ export class Character {
         }
     }
 
-    removeItemFromInventory(index, page = this.currentInventoryPage ? this.currentInventoryPage : -1) {
+    removeItemFromInventory(index, page = this.currentInventoryPage) {
         if (!this.isInInventory)
             return;
         switch (page) {
@@ -420,13 +425,13 @@ export class Character {
                 const temp = this.getCumulatedInventory();
                 return this.removeItemFromInventory(temp[index].originalIndex, temp[index].type);
             case 1:
-                return this.inventory.weapons.splice(index, 1);
+                return this.inventory.weapons.splice(index, 1)[0];
             case 2:
-                return this.inventory.apparel.splice(index, 1);
+                return this.inventory.apparel.splice(index, 1)[0];
             case 3:
-                return this.inventory.potions.splice(index, 1);
+                return this.inventory.potions.splice(index, 1)[0];
             case 4:
-                return this.inventory.misc.splice(index, 1);
+                return this.inventory.misc.splice(index, 1)[0];
             default:
                 return;
         }
@@ -438,7 +443,6 @@ export class Character {
         switch (page) {
             case 0:
                 const temp = this.getCumulatedInventory();
-                console.log(index);
                 this.itemInfo(temp[index].originalIndex, temp[index].type);
                 break;
             case 1:
@@ -495,7 +499,7 @@ export class Character {
         }
     }
 
-    useItem(index, page = this.currentInventoryPage ? this.currentInventoryPage : -1) {
+    useItem(index, page = this.currentInventoryPage) {
         if (!this.isInInventory)
             return;
         switch (page) {
@@ -504,13 +508,13 @@ export class Character {
                 this.useItem(temp[index].originalIndex, temp[index].type);
                 break;
             case 1:
-                this.equipWeapon(index);
+                this.equipWeapon(index, 1);
                 break;
             case 2:
-                this.equipArmor(index);
+                this.equipArmor(index, 2);
                 break;
             case 3:
-                this.usePotion(index);
+                this.usePotion(index, page);
                 break;
             case 4:
                 console.log(chalk.redBright("This item cannot be used yet. (message sent by character.useItem)"));
@@ -520,11 +524,11 @@ export class Character {
         }
     }
 
-    equipWeapon(index) {
+    equipWeapon(index, page = this.currentInventoryPage) {
         let temp = null;
         if (this.equipment.weapon)
             temp = this.equipment.weapon.clone();
-        this.equipment.weapon = this.removeItemFromInventory(temp[index]);
+        this.equipment.weapon = this.removeItemFromInventory(index, page);
         if (temp)
             this.addItemToInventory(temp);
     }
@@ -537,44 +541,46 @@ export class Character {
         }
     }
 
-    equipArmor(index) {
+    equipArmor(index, page = this.currentInventoryPage) {
         let temp = null;
-        const item = this.removeItemFromInventory(index);
+        const item = this.removeItemFromInventory(index, page);
+        //console.log(item);
         switch (item.getSubTypes()[0]) {
             case "Head":
                 if (this.equipment.head)
                     temp = this.equipment.head.clone();
-                this.equipment.head = this.removeItemFromInventory(temp[index]);
+                this.equipment.head = item;
                 break;
             case "Main":
                 if (this.equipment.main)
                     temp = this.equipment.main.clone();
-                this.equipment.main = this.removeItemFromInventory(temp[index]);
+                this.equipment.main = item;
                 break;
             case "Arms":
                 if (this.equipment.arms)
                     temp = this.equipment.arms.clone();
-                this.equipment.arms = this.removeItemFromInventory(temp[index]);
+                this.equipment.arms = item;
                 break;
             case "Feet":
                 if (this.equipment.feet)
                     temp = this.equipment.feet.clone();
-                this.equipment.feet = this.removeItemFromInventory(temp[index]);
+                this.equipment.feet = item;
                 break;
             case "Shield":
                 if (this.equipment.shield)
                     temp = this.equipment.shield.clone();
-                this.equipment.shield = this.removeItemFromInventory(temp[index]);
+                this.equipment.shield = item;
                 break;
             default:
+                this.addItemToInventory(item);
                 break;
         }
         if (temp)
             this.addItemToInventory(temp)
     }
 
-    usePotion(index) {
-        const item = this.removeItemFromInventory(index);
+    usePotion(index, page = this.currentInventoryPage) {
+        const item = this.removeItemFromInventory(index, page);
         switch (item.getSubTypes()[0]) {
             case "Restore":
                 switch (item.getSubTypes()[1]) {
@@ -592,7 +598,7 @@ export class Character {
                 }
                 break;
             case "Augment":
-                this.effects.push(item.effect.clone());
+                this.addEffect(item.effect.clone());
                 break;
             default:
                 break;
@@ -656,7 +662,7 @@ export class Character {
 
     addEffect(effect) {
         const newEffect = effect.clone();
-        newEffect.trigger();
+        newEffect.trigger(this);
         this.effects.push(newEffect);
     }
 
@@ -847,6 +853,7 @@ export class Character {
 
     onStartTurn() {
         this.applyEffects();
+        this.isOverencumbered = (this.getEncumbrance() > this.getMaxEncumbrance())
     }
 
     onEndTurn() {
@@ -866,10 +873,12 @@ export class Character {
     }
 
     rest(amountTurns = 1) {
-        for (let i = 0; i < amountTurns; i++) {
+        for (let i = 0; i < 3 * amountTurns; i++) {
             this.onStartTurn();
             this.onEndTurn();
         }
+        console.clear();
+        console.log(chalk.blueBright("You awaken feeling refreshed\n"));
     }
 
     //combat//
@@ -904,7 +913,7 @@ export class Character {
         return cumulatedDamage;
     }
 
-    castSpell(index, page = this.currentSpellBookPage ? this.currentSpellBookPage : -1) {
+    castSpell(index, page = this.currentSpellBookPage) {
         const output = {success: false, value: 0, spell: null};
         if (page === -1 || !this.isInSpellbook)
             return output;

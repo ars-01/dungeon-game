@@ -1,6 +1,7 @@
-import {roomLayouts, walls} from "../resources/tables.js";
+import {getRandomItem, roomLayouts, walls} from "../resources/tables.js";
 import chalk from "chalk";
 import {Tile} from "./tile.js";
+import {getRandomLeveledEnemy} from "../helpers/enemyHelper.js";
 
 export class Dungeon {
 
@@ -26,6 +27,17 @@ export class Dungeon {
                     this.tiles.push(new Tile(pos));
             }
         }
+        for (let i = 0; i < Math.ceil(Math.random() * this.tiles.length); i++) {
+            const index = Math.floor(Math.random() * this.tiles.length);
+            this.tiles[index].addItem(getRandomItem(this.level));
+        }
+        this.enemies.push(getRandomLeveledEnemy(this.level, this.tiles[Math.floor(Math.random() * this.tiles.length)].pos));
+        if (this.tiles.length >= 7)
+            this.enemies.push(getRandomLeveledEnemy(this.level, this.tiles[Math.floor(Math.random() * this.tiles.length)].pos));
+        if (this.tiles.length >= 14)
+            this.enemies.push(getRandomLeveledEnemy(this.level, this.tiles[Math.floor(Math.random() * this.tiles.length)].pos));
+        if (this.tiles.length >= 21)
+            this.enemies.push(getRandomLeveledEnemy(this.level, this.tiles[Math.floor(Math.random() * this.tiles.length)].pos));
     }
 
     getTileAt(pos) {

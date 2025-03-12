@@ -1,0 +1,157 @@
+{
+    "level": 0,
+    "root": [
+        {
+            "id": 0,
+            "x": 0,
+            "y": 0,
+            "parent": -1,
+            "children": [
+                1,
+                6
+            ]
+        },
+        {
+            "id": 1,
+            "x": 0,
+            "y": 1,
+            "parent": 0,
+            "children": [
+                2
+            ]
+        },
+        {
+            "id": 2,
+            "x": -1,
+            "y": 1,
+            "parent": 1,
+            "children": [
+                3,
+                4
+            ]
+        },
+        {
+            "id": 3,
+            "x": -1,
+            "y": 0,
+            "parent": 2,
+            "children": []
+        },
+        {
+            "id": 4,
+            "x": -2,
+            "y": 1,
+            "parent": 2,
+            "children": [
+                5
+            ]
+        },
+        {
+            "id": 5,
+            "x": -2,
+            "y": 0,
+            "parent": 4,
+            "children": []
+        },
+        {
+            "id": 6,
+            "x": -1,
+            "y": 0,
+            "parent": 0,
+            "children": []
+        }
+    ],
+    "playerPos": {
+        "x": -2,
+        "y": 0
+    },
+    "enemies": [
+        null
+    ],
+    "tiles": [
+        {
+            "pos": {
+                "x": -2,
+                "y": 0
+            },
+            "gold": 17,
+            "items": [],
+            "isVisible": true,
+            "uncovered": true
+        },
+        {
+            "pos": {
+                "x": -1,
+                "y": 0
+            },
+            "gold": 15,
+            "items": [],
+            "isVisible": true,
+            "uncovered": true
+        },
+        {
+            "pos": {
+                "x": 0,
+                "y": 0
+            },
+            "gold": 7,
+            "items": [
+                {
+                    "name": "Iron Dagger",
+                    "type": "Weapon",
+                    "subtypes": "Melee|OneHanded",
+                    "weight": 2,
+                    "value": 4,
+                    "durability": 125,
+                    "rarity": "Common",
+                    "sellValue": 10,
+                    "effect": null
+                }
+            ],
+            "isVisible": false,
+            "uncovered": true
+        },
+        {
+            "pos": {
+                "x": -2,
+                "y": 1
+            },
+            "gold": 8,
+            "items": [],
+            "isVisible": true,
+            "uncovered": true
+        },
+        {
+            "pos": {
+                "x": -1,
+                "y": 1
+            },
+            "gold": 7,
+            "items": [
+                {
+                    "name": "Iron Mace",
+                    "type": "Weapon",
+                    "subtypes": "Melee|OneHanded",
+                    "weight": 13,
+                    "value": 9,
+                    "durability": 125,
+                    "rarity": "Common",
+                    "sellValue": 35,
+                    "effect": null
+                }
+            ],
+            "isVisible": false,
+            "uncovered": true
+        },
+        {
+            "pos": {
+                "x": 0,
+                "y": 1
+            },
+            "gold": 15,
+            "items": [],
+            "isVisible": false,
+            "uncovered": true
+        }
+    ]
+}

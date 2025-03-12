@@ -41,6 +41,7 @@ export class Item {
     }
 
     detailedInfo() {
+        //TODO: switch by type and print an ascii art picture of item (based type and subtypes, maybe have a render of each item)
         let outputString = `${this.name}\n\n`;
         outputString += `Durability: ${this.durability}\n`;
         outputString += `Category: ${this.type}, ${this.subtypes}\n`;

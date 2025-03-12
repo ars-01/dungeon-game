@@ -49,7 +49,7 @@ export const loadDungeon = async () => {
 }
 
 export const loadPlayer = async () => {
-    const _player = await JSON.parse(fs.readFileSync(`./resources/character.json`, 'utf8'));
+    const _player = await JSON.parse(fs.readFileSync(`./resources/player.json`, 'utf8'));
     return characterFromJSON(_player);
 }
 
@@ -80,7 +80,8 @@ const dungeonFromJSON = (data) => {
     dungeon.playerPos = data.playerPos;
     dungeon.enemies = [];
     for (const enemy of data.enemies) {
-        dungeon.enemies.push(characterFromJSON(enemy));
+        if (enemy)
+            dungeon.enemies.push(characterFromJSON(enemy));
     }
     dungeon.tiles = [];
     for (const tile of data.tiles) {

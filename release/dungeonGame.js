@@ -1,4 +1,4 @@
-import {loadDungeon, loadGraph, saveDungeon, saveGraph, savePlayer} from "./helpers/dataHelper.js";
+import {loadDungeon, loadGraph, loadPlayer, saveDungeon, saveGraph, savePlayer} from "./helpers/dataHelper.js";
 import {generateNewTopology} from "./helpers/generationHelper.js";
 import readline from "readline";
 import {Dungeon} from "./objects/dungeon.js";
@@ -12,13 +12,14 @@ if (process.stdin.isTTY)
 
 let root = generateNewTopology();
 let dungeon = new Dungeon(root);
-const player = new Character("Player", {x: 0, y: 0}, 100, 100, 100, true);
+let player = new Character("Player", {x: 0, y: 0}, 100, 100, 100, true);
 dungeon.print(player.pos);
 console.log("\x1b[?25l");
 
 player.addItemToInventory(items.common[0].clone());
 player.addItemToInventory(items.rare[0].clone());
 player.addItemToInventory(items.mythic[11].clone());
+player.addItemToInventory(items.rare[29].clone());
 
 process.stdin.on('keypress', async (chunk, key) => {
     if (!key) return;
@@ -41,6 +42,7 @@ process.stdin.on('keypress', async (chunk, key) => {
     }
     if (key.name === "f9") {
         dungeon = await loadDungeon();
+        player = await loadPlayer();
         player.pos = dungeon.playerPos;
         console.log("loaded game");
     }
@@ -49,6 +51,9 @@ process.stdin.on('keypress', async (chunk, key) => {
     }
     if (key.name === "o" && !player.isInInventory) {
         player.isInSpellbook = true;
+    }
+    if (key.name === "p") {
+        player.printEquipment(true);
     }
 
     playerAction(player, dungeon, key.name);
