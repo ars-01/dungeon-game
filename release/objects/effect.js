@@ -63,6 +63,18 @@ export class Effect {
             case "DamageMana":
                 character.mana = character.mana - this.magnitude * this.subtype <= 0 ? 0 : character.mana - this.magnitude * this.subtype;
                 break;
+            case "FortifyDestruction":
+                character.destructionSkillBonus += this.magnitude * this.subtype;
+                character.destructionSkillBonus = character.destructionSkillBonus >= 1 ? 1 : character.destructionSkillBonus;
+                break;
+            case "FortifyRestoration":
+                character.restorationSkillBonus += this.magnitude * this.subtype;
+                character.restorationSkillBonus = character.restorationSkillBonus >= 1 ? 1 : character.restorationSkillBonus;
+                break;
+            case "FortifyAlteration":
+                character.alterationSkillBonus += this.magnitude * this.subtype;
+                character.alterationSkillBonus = character.alterationSkillBonus >= 1 ? 1 : character.alterationSkillBonus;
+                break;
             default:
                 break;
 

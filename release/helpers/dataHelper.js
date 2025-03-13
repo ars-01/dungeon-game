@@ -146,10 +146,13 @@ const characterFromJSON = (data) => {
 
     character.destructionSkill = data.destructionSkill;
     character.destructionSkillXP = data.destructionSkillXP;
+    character.destructionSkillBonus = data.destructionSkillBonus;
     character.restorationSkill = data.restorationSkill;
     character.restorationSkillXP = data.restorationSkillXP;
+    character.restorationSkillBonus = data.restorationSkillBonus;
     character.alterationSkill = data.alterationSkill;
     character.restorationSkillXP = data.restorationSkillXP;
+    character.alterationSkillBonus = data.alterationSkillBonus;
     character.heavyArmorSkill = data.heavyArmorSkill;
     character.heavyArmorSkillXP = data.heavyArmorSkillXP;
     character.blockSkill = data.blockSkill;

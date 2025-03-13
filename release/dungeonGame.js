@@ -1,18 +1,21 @@
-import {loadDungeon, loadGraph, loadPlayer, saveDungeon, saveGraph, savePlayer} from "./helpers/dataHelper.js";
+import {loadDungeon, loadPlayer, saveDungeon, savePlayer} from "./helpers/dataHelper.js";
 import {generateNewTopology} from "./helpers/generationHelper.js";
 import readline from "readline";
 import {Dungeon} from "./objects/dungeon.js";
 import {Character} from "./objects/character.js";
 import {playerAction} from "./helpers/playerActionHelper.js";
 import {items} from "./resources/tables.js";
+import {getRandomLeveledEnemy} from "./helpers/npcHelper.js";
+import {getId} from "./helpers/functionsHelper.js";
 
 readline.emitKeypressEvents(process.stdin);
 if (process.stdin.isTTY)
     process.stdin.setRawMode(true);
 
+let player = new Character("Player", {x: 0, y: 0}, 100, 100, 100, true, 1);
 let root = generateNewTopology();
-let dungeon = new Dungeon(root);
-let player = new Character("Player", {x: 0, y: 0}, 100, 100, 100, true);
+let dungeon = new Dungeon(root, player.characterLevel);
+
 dungeon.print(player.pos);
 console.log("\x1b[?25l");
 
@@ -32,7 +35,7 @@ process.stdin.on('keypress', async (chunk, key) => {
 
     if(key.name === 'n') {
         root = generateNewTopology();
-        dungeon = new Dungeon(root);
+        dungeon = new Dungeon(root, player.characterLevel);
         player.pos = {x: dungeon.root.x, y: dungeon.root.y};
     }
     if (key.name === "f5") {
@@ -56,6 +59,7 @@ process.stdin.on('keypress', async (chunk, key) => {
         player.printEquipment(true);
     }
 
+
     playerAction(player, dungeon, key.name);
     if (!player.isInInventory && !player.isInSpellbook && !player.isTrading && !player.isFighting) {
         dungeon.print(player.pos);
@@ -63,5 +67,9 @@ process.stdin.on('keypress', async (chunk, key) => {
 
     player.printStatus();
 
+    //debug
+    if (key.name === "e" && false) {
+        getRandomLeveledEnemy(getId(1, 100), {x: 0, y: 0});
+    }
 });
 

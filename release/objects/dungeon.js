@@ -1,7 +1,7 @@
 import {getRandomItem, roomLayouts, walls} from "../resources/tables.js";
 import chalk from "chalk";
 import {Tile} from "./tile.js";
-import {getRandomLeveledEnemy} from "../helpers/enemyHelper.js";
+import {getRandomLeveledEnemy} from "../helpers/npcHelper.js";
 
 export class Dungeon {
 

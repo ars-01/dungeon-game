@@ -133,6 +133,12 @@ const executeSpellBookAction = (player, dungeon) => {
 }
 
 const roomAction = (player, dungeon, keyName) => {
+    const tileGold = dungeon.getTileAt(player.pos).gold;
+    if (tileGold > 0) {
+        player.addGold(tileGold);
+        dungeon.getTileAt(player.pos).gold = 0;
+        console.log(chalk.blueBright(`You found ${tileGold} gold`));
+    }
     if (dungeon.getTileAt(player.pos).items.length <= 0)
         return;
     dungeon.getTileAt(player.pos).printItems();

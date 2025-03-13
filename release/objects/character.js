@@ -67,10 +67,13 @@ export class Character {
 
     destructionSkill = 1;
     destructionSkillXP = 0;
+    destructionSkillBonus = 0;
     restorationSkill = 1;
     restorationSkillXP = 0;
+    restorationSkillBonus = 0;
     alterationSkill = 1;
     alterationSkillXP = 0;
+    alterationSkillBonus = 0;
 
     //warrior
 
@@ -80,8 +83,6 @@ export class Character {
     blockSkillXP = 0;
     twoHandedSkill = 1;
     twoHandedSkillXP = 0;
-    oneHandedSkill = 1;
-    oneHandedSkillXP = 0;
 
     //thief
 
@@ -89,8 +90,10 @@ export class Character {
     lightArmorSkillXP = 0;
     speechSkill = 1;
     speechSkillXP = 0;
+    oneHandedSkill = 1;
+    oneHandedSkillXP = 0;
 
-    constructor(name, pos, maxHealth, maxStamina, maxMana, isPlayer = false, level = 1, canTrade = false) {
+    constructor(name, pos, maxHealth, maxStamina, maxMana, isPlayer = false, level = 0, canTrade = false) {
         this.name = name;
         this.pos = pos;
         this.characterLevel = level;
@@ -159,10 +162,13 @@ export class Character {
 
         copy.destructionSkill = this.destructionSkill;
         copy.destructionSkillXP = this.destructionSkillXP;
+        copy.destructionSkillBonus = this.destructionSkillBonus;
         copy.restorationSkill = this.restorationSkill;
         copy.restorationSkillXP = this.restorationSkillXP;
+        copy.restorationSkillBonus = this.restorationSkillBonus;
         copy.alterationSkill = this.alterationSkill;
         copy.restorationSkillXP = this.restorationSkillXP;
+        copy.alterationSkillBonus = this.alterationSkillBonus;
         copy.heavyArmorSkill = this.heavyArmorSkill;
         copy.heavyArmorSkillXP = this.heavyArmorSkillXP;
         copy.blockSkill = this.blockSkill;
@@ -421,7 +427,7 @@ export class Character {
             return;
         switch (page) {
             case 0:
-                console.log(index);
+                //console.log(index);
                 const temp = this.getCumulatedInventory();
                 return this.removeItemFromInventory(temp[index].originalIndex, temp[index].type);
             case 1:
@@ -941,15 +947,15 @@ export class Character {
                     return output;
                 output.value = Math.floor(spell.value * (1 + (this.destructionSkill / 100)));
                 output.spell = spell.clone();
-                manaCost = Math.ceil(spell.manaCost * (1 - (1 / this.destructionSkill >= 100 ? 100 : this.destructionSkill)));
+                manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.destructionSkill >= 100 ? 1 : (101 - this.destructionSkill)))) * (1 - this.destructionSkillBonus));
                 break;
             case "Restoration":
                 output.value = Math.floor(spell.value * (1 + (this.restorationSkill / 100)));
-                manaCost = Math.ceil(spell.manaCost * (1 - (1 / this.restorationSkill >= 100 ? 100 : this.restorationSkill)));
+                manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.restorationSkill >= 100 ? 1 : (101 - this.restorationSkill))))  * (1 - this.restorationSkillBonus));
                 break;
             case "Alteration":
                 output.value = spell.value;
-                manaCost = Math.ceil(spell.manaCost * (1 - (1 / this.alterationSkill >= 100 ? 100 : this.alterationSkill)));
+                manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.alterationSkill >= 100 ? 1 : (101 - this.alterationSkill)))) * (1 - this.alterationSkillBonus));
                 break;
             default:
                 break;
