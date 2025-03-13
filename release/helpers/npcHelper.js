@@ -9,10 +9,10 @@ import {
 
 const enemyNames = {
     warriors: {
-        common: ["Bandit", "Forsworn", "Reaver", "Draugr", "Thug", "Draugr Thrall"],
-        uncommon: ["Bandit Outlaw", "Bandit Thug", "Forsworn Forager", "Forsworn Looter", "Reaver Outlaw", "Reaver Thug", "Restless Draugr", "Draugr Overlord"],
-        rare: ["Bandit Highwayman", "Bandit Plunderer", "Forsworn Pillager", "Forsworn Ravager", "Reaver Highwayman", "Reaver Plunderer", "Draugr Wight", "Draugr Wight Lord"],
-        mythic: ["Bandit Marauder", "Bandit Chief", "Forsworn Briarheart", "Reaver Marauder", "Reaver Lord", "Draugr Scourge", "Draugr Deathlord"]
+        common: ["Bandit", "Forsworn", "Reaver", "Draugr", "Thug", "Draugr Thrall", "Dremora Churl"],
+        uncommon: ["Bandit Outlaw", "Bandit Thug", "Forsworn Forager", "Forsworn Looter", "Reaver Outlaw", "Reaver Thug", "Restless Draugr", "Draugr Overlord", "Dremora Caitiff", "Dremora Kynval"],
+        rare: ["Bandit Highwayman", "Bandit Plunderer", "Forsworn Pillager", "Forsworn Ravager", "Reaver Highwayman", "Reaver Plunderer", "Draugr Wight", "Draugr Wight Lord", "Dremora Kynreeve", "Dremora Markynaz"],
+        mythic: ["Bandit Marauder", "Bandit Chief", "Forsworn Briarheart", "Reaver Marauder", "Reaver Lord", "Draugr Scourge", "Draugr Deathlord", "Dremora Valkynaz"]
     },
 
     mages: {

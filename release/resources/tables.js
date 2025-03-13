@@ -221,7 +221,36 @@ export const getRandomWeapon = (rarity, weaponClass) => {
 }
 
 export const getRandomShield = (rarity) => {
-    return null;
+    const temp = [];
+    switch (rarity) {
+        case "Common":
+            for (const item of items.common) {
+                if (item.type === "Apparel" && item.getSubTypes()[0] === "Shield")
+                    temp.push(item.clone());
+            }
+            break;
+        case "Uncommon":
+            for (const item of items.uncommon) {
+                if (item.type === "Apparel" && item.getSubTypes()[0] === "Shield")
+                    temp.push(item.clone());
+            }
+            break;
+        case "Rare":
+            for (const item of items.rare) {
+                if (item.type === "Apparel" && item.getSubTypes()[0] === "Shield")
+                    temp.push(item.clone());
+            }
+            break;
+        case "Mythic":
+            for (const item of items.mythic) {
+                if (item.type === "Apparel" && item.getSubTypes()[0] === "Shield")
+                    temp.push(item.clone());
+            }
+            break;
+        default:
+            return null;
+    }
+    return temp[Math.floor(Math.random() * temp.length)];
 }
 
 export const walls = {
