@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import {getId} from "./functionsHelper.js";
+import {autoDefend} from "./combatHelper.js";
 
 const inventoryDialogueOptions = ["Inspect", "Drop", "Use", "Exit"];
 let currentInventoryDialogueOption = 0;
@@ -124,9 +125,9 @@ const spellBookAction = (character, dungeon, keyName) => {
                 else
                     console.log(chalk.green(`${spellBookDialogueOptions[i]}`));
             }
-        } else {
-
         }
+    } else {
+
     }
 }
 
@@ -141,7 +142,17 @@ const executeSpellBookAction = (character, dungeon) => {
                     character.spellInfo(index);
                 break;
             case 1:
-                //TODO: Cast spell
+                index = getId(1, character.getSpellBookPageLength(character.currentSpellBookPage));
+                if (index !== -100) {
+                    const {success, value, spell, target} = character.castSpell(index);
+                    if (!success || !character.isFighting || target !== "target") {
+                        if (!success)
+                            console.log("Cast Failed");
+                        return;
+                    }
+                    dungeon.getFightingEnemy().takeDamage(value, "Magic");
+                    dungeon.getFightingEnemy().addEffect(spell.effect.clone());
+                }
                 break;
             case 2:
                 character.isInSpellbook = false;
@@ -209,10 +220,14 @@ const executeCombatAction = (character, dungeon) => {
         //Attack, Block, Cast Spell, Run Away
         switch (currentCombatDialogueOption) {
             case 0:
+                const rawDamage = character.getMeleeDamage();
+                autoDefend(dungeon.getFightingEnemy(), rawDamage, "Melee");
                 break;
             case 1:
+                character.block();
                 break;
             case 2:
+                character.isInSpellbook = true;
                 break;
             case 3:
                 character.isRunningAway = true;

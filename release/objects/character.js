@@ -694,6 +694,38 @@ export class Character {
         return (this.maxStamina / 2) * 5;
     }
 
+    getMostCommonArmorType() {
+        let light = 0;
+        let heavy = 0;
+        if (this.equipment.head)
+            if (this.equipment.head.getSubTypes()[1] === "HeavyArmor")
+                heavy++;
+            else if (this.equipment.head.getSubTypes()[1] === "LightArmor")
+                light++;
+        if (this.equipment.main)
+            if (this.equipment.main.getSubTypes()[1] === "HeavyArmor")
+                heavy++;
+            else if (this.equipment.main.getSubTypes()[1] === "LightArmor")
+                light++;
+        if (this.equipment.arms)
+            if (this.equipment.arms.getSubTypes()[1] === "HeavyArmor")
+                heavy++;
+            else if (this.equipment.arms.getSubTypes()[1] === "LightArmor")
+                light++;
+        if (this.equipment.feet)
+            if (this.equipment.feet.getSubTypes()[1] === "HeavyArmor")
+                heavy++;
+            else if (this.equipment.feet.getSubTypes()[1] === "LightArmor")
+                light++;
+        if (this.isBlocking)
+            if (this.equipment.shield)
+                if (this.equipment.shield.getSubTypes()[1] === "HeavyArmor")
+                    heavy++;
+                else if (this.equipment.shield.getSubTypes()[1] === "LightArmor")
+                    light++;
+        return light < heavy ? "HeavyArmor" : "LightArmor";
+    }
+
     unequipAll() {
         if (this.inventory.weapon)
             this.inventory.push(this.equipment.weapon);
@@ -980,7 +1012,7 @@ export class Character {
     }
 
     castSpell(index, page = this.currentSpellBookPage) {
-        const output = {success: false, value: 0, spell: null};
+        const output = {success: false, value: 0, spell: null, target: ""};
         if (page === -1 || !this.isInSpellbook)
             return output;
         let spell;
@@ -1009,30 +1041,37 @@ export class Character {
                     output.value = Math.floor(spell.value * (1 + (this.destructionSkill / 100)));
                     output.spell = spell.clone();
                     manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.destructionSkill >= 100 ? 1 : (101 - this.destructionSkill)))) * (1 - this.destructionSkillBonus));
+                    output.target = "target";
                     break;
                 case "Restoration":
                     output.value = Math.floor(spell.value * (1 + (this.restorationSkill / 100)));
                     manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.restorationSkill >= 100 ? 1 : (101 - this.restorationSkill)))) * (1 - this.restorationSkillBonus));
+                    output.target = "self";
                     break;
                 case "Alteration":
                     output.value = spell.value;
                     manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.alterationSkill >= 100 ? 1 : (101 - this.alterationSkill)))) * (1 - this.alterationSkillBonus));
+                    output.target = "self";
                     break;
                 default:
                     break;
             }
-        if (manaCost > this.mana)
+        if (manaCost > this.mana) {
             return output;
+        }
         output.success = true;
         switch (spell.subtype) {
             case "Health":
                 this.health = this.health + output.value >= this.maxHealth + this.healthBonus ? this.maxHealth + this.healthBonus : this.health + output.value;
+                output.target = "self";
                 break;
             case "Stamina":
                 this.stamina = this.stamina + output.value >= this.maxStamina + this.staminaBonus ? this.maxStamina + this.staminaBonus : this.stamina + output.value;
+                output.target = "self";
                 break;
             case "Armor":
                 this.effects.push(spell.effect.clone());
+                output.target = "self";
                 break;
             case "Armor|MagicResistance":
                 if (!this.isFighting)
@@ -1040,14 +1079,17 @@ export class Character {
                 const wardType = spell.name.split(" ")[0];
                 this.effects.push(new Effect(`Ward - ${wardType}`, "MagicResistance", 1, 1, spell.value));
                 this.effects.push(new Effect(`Shield - ${wardType}`, "Armor", 1, 1, spell.value * 100));
+                output.target = "self";
                 break;
             case "Paralysis":
                 if (!this.isFighting)
                     output.success = false;
-                output.spell = spell.effect.clone();
+                output.spell = spell.clone();
+                output.target = "target";
                 break;
             case "HealthToManaConversion":
                 this.addEffect(spell.effect.clone());
+                output.target = "self";
                 break;
             default:
                 break;
@@ -1065,7 +1107,7 @@ export class Character {
             finalDamage *= (1 - this.magicResistance);
         else if (damageType === "Melee")
             finalDamage *= (1 - this.meleeResistance);
-        else if (damageType !== "True")
+        if (damageType !== "True")
             finalDamage *= (1 - armorValue);
         finalDamage = Math.floor(finalDamage);
         if (finalDamage > 0) {
@@ -1074,8 +1116,11 @@ export class Character {
         } else {
             console.log(chalk.blueBright(`${this.name} takes no damage`));
         }
-        //TODO: this.advanceSkill(this.getArmorType(), rawDamage);
-        //TODO: if (this.blocking) this.advanceSkill("Block", rawDamage);
+
+        this.advanceSkill(this.getMostCommonArmorType(), rawDamage);
+
+        if (this.isBlocking && damageType !== "Magic")
+            this.advanceSkill("Block", rawDamage);
     }
 
     block() {
