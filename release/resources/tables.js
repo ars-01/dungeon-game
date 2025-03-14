@@ -253,6 +253,159 @@ export const getRandomShield = (rarity) => {
     return temp[Math.floor(Math.random() * temp.length)];
 }
 
+export const getRandomSpellTome = (rarity) => {
+    const temp = [];
+    switch (rarity) {
+        case "Common":
+            for (const item of items.common) {
+                if (item.type === "Misc" && item.getSubTypes()[0] === "Book" && item.getSubTypes()[1] === "SpellTome")
+                    temp.push(item.clone());
+            }
+            break;
+        case "Uncommon":
+            for (const item of items.uncommon) {
+                if (item.type === "Misc" && item.getSubTypes()[0] === "Book" && item.getSubTypes()[1] === "SpellTome")
+                    temp.push(item.clone());
+            }
+            break;
+        case "Rare":
+            for (const item of items.rare) {
+                if (item.type === "Misc" && item.getSubTypes()[0] === "Book" && item.getSubTypes()[1] === "SpellTome")
+                    temp.push(item.clone());
+            }
+            break;
+        case "Mythic":
+            for (const item of items.mythic) {
+                if (item.type === "Misc" && item.getSubTypes()[0] === "Book" && item.getSubTypes()[1] === "SpellTome")
+                    temp.push(item.clone());
+            }
+            break;
+        default:
+            return null;
+    }
+    return temp[Math.floor(Math.random() * temp.length)];
+}
+
+export const getRandomPotion = (rarity) => {
+    const temp = [];
+    switch (rarity) {
+        case "Common":
+            for (const item of items.common) {
+                if (item.type === "Potion")
+                    temp.push(item.clone());
+            }
+            break;
+        case "Uncommon":
+            for (const item of items.uncommon) {
+                if (item.type === "Potion")
+                    temp.push(item.clone());
+            }
+            break;
+        case "Rare":
+            for (const item of items.rare) {
+                if (item.type === "Potion")
+                    temp.push(item.clone());
+            }
+            break;
+        case "Mythic":
+            for (const item of items.mythic) {
+                if (item.type === "Potion")
+                    temp.push(item.clone());
+            }
+            break;
+        default:
+            return null;
+    }
+    return temp[Math.floor(Math.random() * temp.length)];
+}
+
+export const getRandomDestructionSpell = (rarity) => {
+    const temp = [];
+    switch (rarity) {
+        case "Common":
+            temp.push(spells.flames.clone());
+            temp.push(spells.frostbite.clone());
+            temp.push(spells.sparks.clone());
+            break;
+        case "Uncommon":
+            temp.push(spells.fireBolt.clone());
+            temp.push(spells.iceSpike.clone());
+            temp.push(spells.lightningBolt.clone());
+            break;
+        case "Rare":
+            temp.push(spells.fireball.clone());
+            temp.push(spells.iceStorm.clone());
+            temp.push(spells.chainLightning.clone());
+            break;
+        case "Mythic":
+            temp.push(spells.incinerate.clone());
+            temp.push(spells.icySpear.clone());
+            temp.push(spells.thunderbolt.clone());
+            break;
+        case "Master":
+            temp.push(spells.fireStorm.clone());
+            temp.push(spells.blizzard.clone());
+            temp.push(spells.lightningStorm.clone());
+            break;
+        default:
+            return null;
+    }
+    return temp[Math.floor(Math.random() * temp.length)];
+}
+
+export const getRandomRestorationSpell = (rarity) => {
+    const temp = [];
+    switch (rarity) {
+        case "Common":
+            temp.push(spells.healing.clone());
+            temp.push(spells.shortRest.clone());
+            break;
+        case "Uncommon":
+            temp.push(spells.fastHealing.clone());
+            temp.push(spells.quickRecovery.clone());
+            break;
+        case "Rare":
+            temp.push(spells.closeWounds.clone());
+            temp.push(spells.relaxation.clone());
+            break;
+        case "Mythic":
+            temp.push(spells.grandHealing.clone());
+            temp.push(spells.wakingSleep.clone());
+            break;
+        default:
+            return null;
+    }
+    return temp[Math.floor(Math.random() * temp.length)];
+}
+
+export const getRandomProtectionSpell = (rarity) => {
+    const temp = [];
+    switch (rarity) {
+        case "Common":
+            temp.push(spells.oakFlesh.clone());
+            temp.push(spells.lesserWard.clone());
+            break;
+        case "Uncommon":
+            temp.push(spells.stoneFlesh.clone());
+            temp.push(spells.steadfastWard.clone());
+            break;
+        case "Rare":
+            temp.push(spells.ironFlesh.clone());
+            temp.push(spells.greaterWard.clone());
+            break;
+        case "Mythic":
+            temp.push(spells.ebonyFlesh.clone());
+            temp.push(spells.greaterWard.clone());
+            break;
+        case "Master":
+            temp.push(spells.dragonHide.clone());
+            break;
+        default:
+            return null;
+    }
+    return temp[Math.floor(Math.random() * temp.length)];
+}
+
 export const walls = {
     horizontalHallwayDown: ("██▓█  ▓█▓█" +
                             "▓██▒  ░██▓").split(""),
@@ -344,7 +497,7 @@ export const effects = {
     fireStorm: new Effect("FireStorm", "DamageHealth", 1, 1, 40),
 
     frostbite: new Effect("Frostbite", "DamageStamina", 1, 1, 8),
-    freeze: new Effect("Freeze", "DamageStamina", 1, 1, 25),
+    iceSpike: new Effect("Ice Spike", "DamageStamina", 1, 1, 25),
     iceStorm: new Effect("Ice Storm", "DamageStamina", 1, 1, 40),
     icySpear: new Effect("Icy Spear", "DamageStamina", 1, 1, 60),
     blizzard: new Effect("Blizzard", "DamageStamina", 1, 2, 100),
@@ -360,7 +513,8 @@ export const effects = {
     armorIron: new Effect("Armor - Iron", "Armor", 1, 12, 80),
     armorEbony: new Effect("Armor - Ebony", "Armor", 1, 12, 100),
     armorDragonhide: new Effect("Armor - Dragonhide", "MeleeResistance", 1, 12, 80),
-    paralyze: new Effect("Paralyze", "Paralysis", 1, 2, 1)
+    paralyze: new Effect("Paralyze", "Paralysis", 1, 2, 1),
+    equilibrium: new Effect("Equilibrium", "DamageHealth", 1, 1, 25),
 };
 
 export const spells = {
@@ -372,7 +526,7 @@ export const spells = {
     fireStorm: new Spell("Fire Storm", "Destruction", "Fire", 100, 1426, effects.fireStorm.clone()),
 
     frostbite: new Spell("Frostbite", "Destruction", "Ice", 8, 16, effects.frostbite.clone()),
-    freeze: new Spell("Freeze", "Destruction", "Ice", 25, 41, effects.freeze.clone()),
+    iceSpike: new Spell("Ice Spike", "Destruction", "Ice", 25, 48, effects.iceSpike.clone()),
     iceStorm: new Spell("Ice Storm", "Destruction", "Ice", 40, 144, effects.iceStorm.clone()),
     icySpear: new Spell("Icy Spear", "Destruction", "Ice", 60, 320, effects.icySpear.clone()),
     blizzard: new Spell("Blizzard", "Destruction", "Ice", 100, 1106, effects.blizzard.clone()),
@@ -407,6 +561,7 @@ export const spells = {
     ebonyFlesh: new Spell("Ebonyflesh", "Alteration", "Armor", 100, 341, effects.armorEbony.clone()),
     dragonHide: new Spell("Dragonhide", "Alteration", "Armor", 800, 837, effects.armorDragonhide.clone()),
     paralyze: new Spell("Paralyze", "Alteration", "Paralysis", 450, 450, effects.paralyze.clone()),
+    equilibrium: new Spell("Equilibrium", "Alteration", "HealthToManaConversion", 1, -25, effects.equilibrium.clone()),
 };
 
 export const items = {
@@ -510,9 +665,30 @@ export const items = {
         new Item("Potion of Fortify Stamina", "Potion", "Augment|Stamina", 1, 5, 0.25,"Common", 23,
             new Effect("Increased Stamina", "Stamina", 1, 6, 10)),
 
-        //Misc (Books)
-        new Item("Spell Tome: Flames", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 150,
+        //Misc (Spell Tomes)
+        //Destruction
+        new Item("Spell Tome: Flames", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 50,
             new Effect("Learn Spell: Flames", "LearnSpell", 1, 1, 100)),
+        new Item("Spell Tome: Frostbite", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 47,
+            new Effect("Learn Spell: Frostbite", "LearnSpell", 1, 1, 101)),
+        new Item("Spell Tome: Sparks", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 46,
+            new Effect("Learn Spell: Sparks", "LearnSpell", 1, 1, 102)),
+        new Item("Spell Tome: Firebolt", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 96,
+            new Effect("Learn Spell: Firebolt", "LearnSpell", 1, 1, 110)),
+        new Item("Spell Tome: Ice Spike", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 96,
+            new Effect("Learn Spell: Ice Spike", "LearnSpell", 1, 1, 111)),
+        new Item("Spell Tome: Lightning Bolt", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 95,
+            new Effect("Learn Spell: Lightning Bolt", "LearnSpell", 1, 1, 112)),
+        //Restoration
+        new Item("Spell Tome: Healing", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 50,
+            new Effect("Learn Spell: Healing", "LearnSpell", 1, 1, 200)),
+        new Item("Spell Tome: Short Rest", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 34,
+            new Effect("Learn Spell: Short Rest", "LearnSpell", 1, 1, 201)),
+        new Item("Spell Tome: Lesser Ward", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 45,
+            new Effect("Learn Spell: Lesser Ward", "LearnSpell", 1, 1, 202)),
+        //Alteration
+        new Item("Spell Tome: Oakflesh", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 44,
+            new Effect("Learn Spell: Oakflesh", "LearnSpell", 1, 1, 300)),
     ],
     uncommon: [
         //OneHanded Weapons
@@ -621,6 +797,26 @@ export const items = {
         new Item("Potion of Fortify Stamina", "Potion", "Augment|Stamina", 1, 10, 0.25,"Uncommon", 41,
             new Effect("Increased Stamina", "Stamina", 1, 6, 20)),
 
+        //Misc (Spell Tomes)
+        //Destruction
+        new Item("Spell Tome: Fireball", "Misc", "Book|SpellTome", 1, 1, 1, "Uncommon", 345,
+            new Effect("Learn Spell: Fireball", "LearnSpell", 1, 1, 120)),
+        new Item("Spell Tome: Ice Storm", "Misc", "Book|SpellTome", 1, 1, 1, "Uncommon", 360,
+            new Effect("Learn Spell: Ice Storm", "LearnSpell", 1, 1, 121)),
+        new Item("Spell Tome: Chain Lightning", "Misc", "Book|SpellTome", 1, 1, 1, "Uncommon", 390,
+            new Effect("Learn Spell: Chain Lightning", "LearnSpell", 1, 1, 122)),
+        //Restoration
+        new Item("Spell Tome: Fast Healing", "Misc", "Book|SpellTome", 1, 1, 1, "Uncommon", 94,
+            new Effect("Learn Spell: Fast Healing", "LearnSpell", 1, 1, 210)),
+        new Item("Spell Tome: Quick Recovery", "Misc", "Book|SpellTome", 1, 1, 1, "Uncommon", 76,
+            new Effect("Learn Spell: Fast Healing", "LearnSpell", 1, 1, 211)),
+        new Item("Spell Tome: Steadfast Ward", "Misc", "Book|SpellTome", 1, 1, 1, "Uncommon", 92,
+            new Effect("Learn Spell: Steadfast Ward", "LearnSpell", 1, 1, 212)),
+        //Alteration
+        new Item("Spell Tome: Stoneflesh", "Misc", "Book|SpellTome", 1, 1, 1, "Uncommon", 95,
+            new Effect("Learn Spell: Stoneflesh", "LearnSpell", 1, 1, 310)),
+        new Item("Spell Tome: Equilibrium", "Misc", "Book|SpellTome", 1, 1, 1, "Uncommon", 135,
+            new Effect("Learn Spell: Equilibrium", "LearnSpell", 1, 1, 311)),
     ],
     rare: [
         //OneHanded Weapons
@@ -729,6 +925,27 @@ export const items = {
             new Effect("Increased Health", "Health", 1, 6, 30)),
         new Item("Potion of Fortify Stamina", "Potion", "Augment|Stamina", 1, 15, 0.25,"Rare", 85,
             new Effect("Increased Stamina", "Stamina", 1, 6, 30)),
+
+        //Misc (Spell Tomes)
+        //Destruction
+        new Item("Spell Tome: Incinerate", "Misc", "Book|SpellTome", 1, 1, 1, "Rare", 710,
+            new Effect("Learn Spell: Incinerate", "LearnSpell", 1, 1, 130)),
+        new Item("Spell Tome: Icy Spear", "Misc", "Book|SpellTome", 1, 1, 1, "Rare", 725,
+            new Effect("Learn Spell: Icy Spear", "LearnSpell", 1, 1, 131)),
+        new Item("Spell Tome: Thunderbolt", "Misc", "Book|SpellTome", 1, 1, 1, "Rare", 750,
+            new Effect("Learn Spell: Thunderbolt", "LearnSpell", 1, 1, 132)),
+        //Restoration
+        new Item("Spell Tome: Close Wounds", "Misc", "Book|SpellTome", 1, 1, 1, "Rare", 360,
+            new Effect("Learn Spell: Close Wounds", "LearnSpell", 1, 1, 220)),
+        new Item("Spell Tome: Relaxation", "Misc", "Book|SpellTome", 1, 1, 1, "Rare", 320,
+            new Effect("Learn Spell: Relaxation", "LearnSpell", 1, 1, 221)),
+        new Item("Spell Tome: Greater Ward", "Misc", "Book|SpellTome", 1, 1, 1, "Rare", 341,
+            new Effect("Learn Spell: Greater Ward", "LearnSpell", 1, 1, 222)),
+        //Alteration
+        new Item("Spell Tome: Ironflesh", "Misc", "Book|SpellTome", 1, 1, 1, "Rare", 341,
+            new Effect("Learn Spell: Ironflesh", "LearnSpell", 1, 1, 320)),
+        new Item("Spell Tome: Paralyze", "Misc", "Book|SpellTome", 1, 1, 1, "Rare", 685,
+            new Effect("Learn Spell: Paralyze", "LearnSpell", 1, 1, 321)),
     ],
     mythic: [
         //OneHanded Weapons
@@ -836,6 +1053,25 @@ export const items = {
             new Effect("Increased Health", "Health", 1, 6, 30)),
         new Item("Potion of Fortify Stamina", "Potion", "Augment|Stamina", 1, 20, 0.25,"Mythic", 275,
             new Effect("Increased Stamina", "Stamina", 1, 6, 50)),
+
+        //Misc (Spell Tomes)
+        //Destruction
+        new Item("Spell Tome: Fire Storm", "Misc", "Book|SpellTome", 1, 1, 1, "Mythic", 1290,
+            new Effect("Learn Spell: Fire Storm", "LearnSpell", 1, 1, 140)),
+        new Item("Spell Tome: Blizzard", "Misc", "Book|SpellTome", 1, 1, 1, "Mythic", 1350,
+            new Effect("Learn Spell: Blizzard", "LearnSpell", 1, 1, 141)),
+        new Item("Spell Tome: Lightning Storm", "Misc", "Book|SpellTome", 1, 1, 1, "Mythic", 1400,
+            new Effect("Learn Spell: Lightning Storm", "LearnSpell", 1, 1, 142)),
+        //Restoration
+        new Item("Spell Tome: Grand Healing", "Misc", "Book|SpellTome", 1, 1, 1, "Mythic", 680,
+            new Effect("Learn Spell: Grand Healing", "LearnSpell", 1, 1, 230)),
+        new Item("Spell Tome: Waking Sleep", "Misc", "Book|SpellTome", 1, 1, 1, "Mythic", 635,
+            new Effect("Learn Spell: Grand Healing", "LearnSpell", 1, 1, 231)),
+        //Alteration
+        new Item("Spell Tome: Ebonyflesh", "Misc", "Book|SpellTome", 1, 1, 1, "Mythic", 650,
+            new Effect("Learn Spell: Ebonyflesh", "LearnSpell", 1, 1, 330)),
+        new Item("Spell Tome: Dragonhide", "Misc", "Book|SpellTome", 1, 1, 1, "Mythic", 1389,
+            new Effect("Learn Spell: Dragonhide", "LearnSpell", 1, 1, 331)),
     ]
 };
 

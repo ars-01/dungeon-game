@@ -92,7 +92,7 @@ export class Effect {
                         character.learnSpell(spells.fireBolt.clone());
                         break;
                     case 111:
-                        character.learnSpell(spells.freeze.clone());
+                        character.learnSpell(spells.iceSpike.clone());
                         break;
                     case 112:
                         character.learnSpell(spells.lightningBolt.clone());
@@ -163,6 +163,9 @@ export class Effect {
                     case 310:
                         character.learnSpell(spells.stoneFlesh.clone());
                         break;
+                    case 311:
+                        character.learnSpell(spells.equilibrium.clone());
+                        break;
                     case 320:
                         character.learnSpell(spells.ironFlesh.clone());
                         break;
@@ -187,6 +190,6 @@ export class Effect {
     }
 
     toString() {
-        return `${this.name}: ${this.subtype * this.magnitude} to ${this.type} for ${this.timeToLive} rounds`;
+        return `${this.name}: ${this.subtype * this.magnitude} to ${this.type}, ${this.timeToLive} rounds remaining`;
     }
 }

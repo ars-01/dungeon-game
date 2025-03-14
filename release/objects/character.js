@@ -353,7 +353,7 @@ export class Character {
                 break;
             case 4:
                 for (const effect of this.effects) {
-                    console.log(chalk.hex("#ffffff")(effect));
+                    console.log(chalk.hex("#ffffff")(effect.toString()));
                 }
                 break;
             default:
@@ -523,7 +523,7 @@ export class Character {
                 this.usePotion(index, page);
                 break;
             case 4:
-                console.log(chalk.redBright("This item cannot be used yet. (message sent by character.useItem)"));
+                this.useMisc(index, page);
                 break;
             default:
                 return;
@@ -607,6 +607,26 @@ export class Character {
                 this.addEffect(item.effect.clone());
                 break;
             default:
+                break;
+        }
+    }
+
+    useMisc(index, page = this.currentInventoryPage) {
+        const item = this.removeItemFromInventory(index, page);
+        switch (item.getSubTypes()[0]) {
+            case "Book":
+                switch (item.getSubTypes()[1]) {
+                    case "SpellTome":
+                        this.addEffect(item.effect.clone());
+                        break;
+                    default:
+                        console.log(chalk.redBright("This item cannot be used yet. (message sent by character.useMisc/SpellTome)"));
+                        break;
+                }
+                break;
+            default:
+                this.addItemToInventory(item);
+                console.log(chalk.redBright("This item cannot be used yet. (message sent by character.useMisc)"));
                 break;
         }
     }
@@ -863,13 +883,13 @@ export class Character {
     }
 
     onEndTurn() {
-        this.health  += 10;
+        this.health  += 1;
         if (this.health > this.maxHealth + this.healthBonus)
             this.health = this.maxHealth + this.healthBonus;
-        this.stamina += 10;
+        this.stamina += 1;
         if (this.stamina > this.maxStamina + this.staminaBonus)
             this.stamina = (this.maxStamina + this.staminaBonus);
-        this.mana += 10;
+        this.mana += 1;
         if (this.mana > (this.maxMana + this.manaBonus))
             this.mana = (this.maxMana + this.manaBonus);
         this.resetBuffs();
@@ -878,8 +898,8 @@ export class Character {
         }
     }
 
-    rest(amountTurns = 1) {
-        for (let i = 0; i < 3 * amountTurns; i++) {
+    rest(hours = 1) {
+        for (let i = 0; i < 12 * 60 * hours; i++) {
             this.onStartTurn();
             this.onEndTurn();
         }
@@ -940,26 +960,27 @@ export class Character {
             default:
                 break;
         }
-        let manaCost;
-        switch (spell.school) {
-            case "Destruction":
-                if (!this.isFighting)
-                    return output;
-                output.value = Math.floor(spell.value * (1 + (this.destructionSkill / 100)));
-                output.spell = spell.clone();
-                manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.destructionSkill >= 100 ? 1 : (101 - this.destructionSkill)))) * (1 - this.destructionSkillBonus));
-                break;
-            case "Restoration":
-                output.value = Math.floor(spell.value * (1 + (this.restorationSkill / 100)));
-                manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.restorationSkill >= 100 ? 1 : (101 - this.restorationSkill))))  * (1 - this.restorationSkillBonus));
-                break;
-            case "Alteration":
-                output.value = spell.value;
-                manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.alterationSkill >= 100 ? 1 : (101 - this.alterationSkill)))) * (1 - this.alterationSkillBonus));
-                break;
-            default:
-                break;
-        }
+        let manaCost = spell.manaCost;
+        if (manaCost >= 0)
+            switch (spell.school) {
+                case "Destruction":
+                    if (!this.isFighting)
+                        return output;
+                    output.value = Math.floor(spell.value * (1 + (this.destructionSkill / 100)));
+                    output.spell = spell.clone();
+                    manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.destructionSkill >= 100 ? 1 : (101 - this.destructionSkill)))) * (1 - this.destructionSkillBonus));
+                    break;
+                case "Restoration":
+                    output.value = Math.floor(spell.value * (1 + (this.restorationSkill / 100)));
+                    manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.restorationSkill >= 100 ? 1 : (101 - this.restorationSkill)))) * (1 - this.restorationSkillBonus));
+                    break;
+                case "Alteration":
+                    output.value = spell.value;
+                    manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.alterationSkill >= 100 ? 1 : (101 - this.alterationSkill)))) * (1 - this.alterationSkillBonus));
+                    break;
+                default:
+                    break;
+            }
         if (manaCost > this.mana)
             return output;
         output.success = true;
@@ -984,6 +1005,9 @@ export class Character {
                 if (!this.isFighting)
                     output.success = false;
                 output.spell = spell.effect.clone();
+                break;
+            case "HealthToManaConversion":
+                this.addEffect(spell.effect.clone());
                 break;
             default:
                 break;

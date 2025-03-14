@@ -3,8 +3,8 @@ import {generateNewTopology} from "./helpers/generationHelper.js";
 import readline from "readline";
 import {Dungeon} from "./objects/dungeon.js";
 import {Character} from "./objects/character.js";
-import {playerAction} from "./helpers/playerActionHelper.js";
-import {items} from "./resources/tables.js";
+import {characterAction} from "./helpers/characterActionHelper.js";
+import {getRandomSpellTome, items} from "./resources/tables.js";
 import {getRandomLeveledEnemy} from "./helpers/npcHelper.js";
 import {getId} from "./helpers/functionsHelper.js";
 
@@ -23,6 +23,7 @@ player.addItemToInventory(items.common[0].clone());
 player.addItemToInventory(items.rare[0].clone());
 player.addItemToInventory(items.mythic[11].clone());
 player.addItemToInventory(items.rare[29].clone());
+player.addItemToInventory(getRandomSpellTome("Common"));
 
 process.stdin.on('keypress', async (chunk, key) => {
     if (!key) return;
@@ -60,16 +61,12 @@ process.stdin.on('keypress', async (chunk, key) => {
     }
 
 
-    playerAction(player, dungeon, key.name);
+    characterAction(player, dungeon, key.name);
     if (!player.isInInventory && !player.isInSpellbook && !player.isTrading && !player.isFighting) {
+        dungeon.enemyTurn();
         dungeon.print(player.pos);
     }
 
     player.printStatus();
-
-    //debug
-    if (key.name === "e" && false) {
-        getRandomLeveledEnemy(getId(1, 100), {x: 0, y: 0});
-    }
 });
 

@@ -2,6 +2,7 @@ import {getRandomItem, roomLayouts, walls} from "../resources/tables.js";
 import chalk from "chalk";
 import {Tile} from "./tile.js";
 import {getRandomLeveledEnemy} from "../helpers/npcHelper.js";
+import {characterAction} from "../helpers/characterActionHelper.js";
 
 export class Dungeon {
 
@@ -31,13 +32,20 @@ export class Dungeon {
             const index = Math.floor(Math.random() * this.tiles.length);
             this.tiles[index].addItem(getRandomItem(this.level));
         }
-        this.enemies.push(getRandomLeveledEnemy(this.level, this.tiles[Math.floor(Math.random() * this.tiles.length)].pos));
-        if (this.tiles.length >= 7)
-            this.enemies.push(getRandomLeveledEnemy(this.level, this.tiles[Math.floor(Math.random() * this.tiles.length)].pos));
-        if (this.tiles.length >= 14)
-            this.enemies.push(getRandomLeveledEnemy(this.level, this.tiles[Math.floor(Math.random() * this.tiles.length)].pos));
-        if (this.tiles.length >= 21)
-            this.enemies.push(getRandomLeveledEnemy(this.level, this.tiles[Math.floor(Math.random() * this.tiles.length)].pos));
+        let index = Math.floor(Math.random() * this.tiles.length);
+        this.enemies.push(getRandomLeveledEnemy(this.level, {x: this.tiles[index].pos.x, y: this.tiles[index].pos.y}));
+        if (this.tiles.length >= 7) {
+            index = Math.floor(Math.random() * this.tiles.length);
+            this.enemies.push(getRandomLeveledEnemy(this.level, {x: this.tiles[index].pos.x, y: this.tiles[index].pos.y}));
+        }
+        if (this.tiles.length >= 14) {
+            index = Math.floor(Math.random() * this.tiles.length);
+            this.enemies.push(getRandomLeveledEnemy(this.level, {x: this.tiles[index].pos.x, y: this.tiles[index].pos.y}));
+        }
+        if (this.tiles.length >= 21) {
+            index = Math.floor(Math.random() * this.tiles.length);
+            this.enemies.push(getRandomLeveledEnemy(this.level, {x: this.tiles[index].pos.x, y: this.tiles[index].pos.y}));
+        }
     }
 
     getTileAt(pos) {
@@ -48,6 +56,15 @@ export class Dungeon {
         return 0;
     }
 
+    enemyTurn() {
+        for (const enemy of this.enemies) {
+            this.getTileAt(enemy.pos).hasEnemy = false;
+            characterAction(enemy, this);
+            this.getTileAt(enemy.pos).hasEnemy = true;
+        }
+
+    }
+
     print(highlightPos) {
         this.playerPos = highlightPos;
         const {minX, minY, maxX, maxY} = this.root.getBounds();
@@ -56,11 +73,13 @@ export class Dungeon {
             for (let x = minX; x <= maxX; x++) {
                 const pos = {x: x, y: y};
                 const tile = this.getTileAt(pos);
-                let connectedToPlayerSpace = this.root.edgeExists(this.playerPos, pos) || (this.playerPos.x === pos.x && this.playerPos.y === pos.y);
+                let connectedToPlayerSpace = this.root.edgeExists(highlightPos, pos) || (highlightPos.x === pos.x && highlightPos.y === pos.y);
                 let innerLayout = roomLayouts.filled;
                 if (isNaN(tile)) {
                     if (connectedToPlayerSpace || tile.uncovered) {
-                        tile.checkVisibility(this.playerPos);
+                        tile.checkVisibility(highlightPos);
+                        if (tile.hasEnemy)
+                            tile.hasEnemy = true;
                         innerLayout = tile.getLayout(connectedToPlayerSpace);
                     }
                 }

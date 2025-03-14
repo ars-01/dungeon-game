@@ -44,7 +44,7 @@ export const loadGraph = async () => {
 }
 
 export const loadDungeon = async () => {
-    const _dungeon = await JSON.parse(fs.readFileSync(`./resources/dungeon.json`, 'utf8'));
+    const _dungeon = await JSON.parse(fs.readFileSync(`./resources/tutorial_dungeon.json`, 'utf8'));
     return dungeonFromJSON(_dungeon);
 }
 
@@ -177,6 +177,7 @@ const tileFromJSON = (data) => {
     tile.gold = data.gold;
     tile.isVisible = data.isVisible;
     tile.uncovered = data.uncovered;
+    tile.hasEnemy = data.hasEnemy;
     return tile;
 }
 

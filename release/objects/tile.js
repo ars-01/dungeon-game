@@ -7,7 +7,7 @@ export class Tile {
     items = [];
     isVisible = false;
     uncovered = false;
-
+    hasEnemy = false;
 
     constructor(pos) {
         this.pos = pos;
@@ -22,6 +22,7 @@ export class Tile {
         copy.gold = this.gold;
         copy.isVisible = this.isVisible;
         copy.uncovered = this.uncovered;
+        copy.hasEnemy = this.hasEnemy
         return copy;
     }
 
@@ -38,10 +39,11 @@ export class Tile {
 
     getLayout(isConnected) {
         if (this.isVisible && isConnected) {
+            if (this.hasEnemy)
+                return roomLayouts.enemy;
             if (this.items.length > 0)
                 return roomLayouts.treasure;
-            else
-                return roomLayouts.empty;
+            return roomLayouts.empty;
         } else {
             if (this.uncovered)
                 return roomLayouts.empty;
