@@ -44,6 +44,7 @@ export class Character {
     isParalyzed = false;
 
     canAct = true;
+    isRunningAway = false;
     isOverencumbered = false;
     isTrading = false;
     isInInventory = false;
@@ -143,6 +144,7 @@ export class Character {
         copy.isParalyzed = this.isParalyzed;
 
         copy.canAct = this.canAct;
+        copy.isRunningAway = this.isRunningAway;
         copy.isOverencumbered = this.isOverencumbered;
         copy.isTrading = this.isTrading;
         copy.isInInventory = this.isInInventory;
@@ -470,7 +472,35 @@ export class Character {
             default:
                 return;
         }
+    }
 
+    spellInfo(index, page = this.currentSpellBookPage) {
+        if (!this.isInSpellbook)
+            return;
+        switch (page) {
+            case 0:
+                const temp = this.getCumulatedSpellBook();
+                this.spellInfo(temp[index].originalIndex, temp[index].type);
+                break;
+            case 1:
+                if (index < this.spells.destruction.length)
+                    this.spells.destruction[index].detailedInfo();
+                break;
+            case 2:
+                if (index < this.spells.restoration.length)
+                    this.spells.restoration[index].detailedInfo();
+                break;
+            case 3:
+                if (index < this.spells.alteration.length)
+                    this.spells.alteration[index].detailedInfo();
+                break;
+            case 4:
+                if (index < this.effects.length)
+                    this.effects[index].detailedInfo();
+                break;
+            default:
+                return;
+        }
     }
 
     getInventoryPageLength(page) {
@@ -845,19 +875,29 @@ export class Character {
     }
 
     learnSpell(spell) {
+        let includes = false;
         switch (spell.school) {
             case "Destruction":
-                if (!this.spells.destruction.includes(spell))
+                for (const _spell of this.spells.destruction)
+                    if (_spell.name === spell.name)
+                        includes = true;
+                if (!includes)
                     this.spells.destruction.push(spell.clone());
                 this.spells.destruction.sort((a, b) => b.name.localeCompare(a.name));
                 break;
             case "Restoration":
-                if (!this.spells.restoration.includes(spell))
+                for (const _spell of this.spells.restoration)
+                    if (_spell.name === spell.name)
+                        includes = true;
+                if (!includes)
                     this.spells.restoration.push(spell.clone());
                 this.spells.restoration.sort((a, b) => b.name.localeCompare(a.name));
                 break;
             case "Alteration":
-                if (!this.spells.alteration.includes(spell))
+                for (const _spell of this.spells.alteration)
+                    if (_spell.name === spell.name)
+                        includes = true;
+                if (!includes)
                     this.spells.alteration.push(spell.clone());
                 this.spells.alteration.sort((a, b) => b.name.localeCompare(a.name));
                 break;

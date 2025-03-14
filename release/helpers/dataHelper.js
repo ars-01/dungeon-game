@@ -44,6 +44,11 @@ export const loadGraph = async () => {
 }
 
 export const loadDungeon = async () => {
+    const _dungeon = await JSON.parse(fs.readFileSync(`./resources/dungeon.json`, 'utf8'));
+    return dungeonFromJSON(_dungeon);
+}
+
+export const loadTutorialDungeon = async () => {
     const _dungeon = await JSON.parse(fs.readFileSync(`./resources/tutorial_dungeon.json`, 'utf8'));
     return dungeonFromJSON(_dungeon);
 }
@@ -127,6 +132,7 @@ const characterFromJSON = (data) => {
     character.isParalyzed = data.isParalyzed;
 
     character.canAct = data.canAct;
+    character.isRunningAway = data.isRunningAway;
     character.isOverencumbered = data.isOverencumbered;
     character.isTrading = data.isTrading;
     character.isInInventory = data.isInInventory;

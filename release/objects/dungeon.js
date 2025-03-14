@@ -62,11 +62,24 @@ export class Dungeon {
             characterAction(enemy, this);
             this.getTileAt(enemy.pos).hasEnemy = true;
         }
-
     }
 
-    print(highlightPos) {
-        this.playerPos = highlightPos;
+    getFightingEnemy() {
+        for (const enemy of this.enemies) {
+            if (enemy.isFighting)
+                return enemy;
+        }
+    }
+
+    resetFighting() {
+        for (const enemy of this.enemies) {
+            enemy.isFighting = false;
+            enemy.canAct = true;
+        }
+    }
+
+    print() {
+        const highlightPos = this.playerPos;
         const {minX, minY, maxX, maxY} = this.root.getBounds();
         for (let y = minY; y <= maxY; y++) {
             const roomRow = ["", "", "", "", "", "", "", "", "", ""];

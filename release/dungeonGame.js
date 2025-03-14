@@ -7,6 +7,7 @@ import {characterAction} from "./helpers/characterActionHelper.js";
 import {getRandomSpellTome, items} from "./resources/tables.js";
 import {getRandomLeveledEnemy} from "./helpers/npcHelper.js";
 import {getId} from "./helpers/functionsHelper.js";
+import {checkCombat} from "./helpers/combatHelper.js";
 
 readline.emitKeypressEvents(process.stdin);
 if (process.stdin.isTTY)
@@ -15,8 +16,8 @@ if (process.stdin.isTTY)
 let player = new Character("Player", {x: 0, y: 0}, 100, 100, 100, true, 1);
 let root = generateNewTopology();
 let dungeon = new Dungeon(root, player.characterLevel);
-
-dungeon.print(player.pos);
+dungeon.playerPos = {x: player.pos.x, y: player.pos.y};
+dungeon.print();
 console.log("\x1b[?25l");
 
 player.addItemToInventory(items.common[0].clone());
@@ -60,13 +61,14 @@ process.stdin.on('keypress', async (chunk, key) => {
         player.printEquipment(true);
     }
 
-
     characterAction(player, dungeon, key.name);
+    dungeon.playerPos = {x: player.pos.x, y: player.pos.y};
     if (!player.isInInventory && !player.isInSpellbook && !player.isTrading && !player.isFighting) {
-        dungeon.enemyTurn();
-        dungeon.print(player.pos);
+        if (!player.isRunningAway)
+            dungeon.enemyTurn();
+        dungeon.print();
     }
-
+    checkCombat(player, dungeon);
     player.printStatus();
 });
 

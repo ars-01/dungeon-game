@@ -7,8 +7,12 @@ let currentInventoryDialogueOption = 0;
 const spellBookDialogueOptions = ["Inspect", "Cast", "Exit"];
 let currentSpellBookDialogueOption = 0;
 
+const combatDialogueOptions = ["Attack", "Block", "Cast Spell", "Run Away"];
+let currentCombatDialogueOption = 0;
+
 const moveCharacter = (character, dungeon, keyName) => {
     character.onStartTurn();
+    character.isRunningAway = false;
     character.move(dungeon.root, keyName);
     character.onEndTurn();
 }
@@ -132,7 +136,9 @@ const executeSpellBookAction = (character, dungeon) => {
         let index = -100;
         switch (currentSpellBookDialogueOption) {
             case 0:
-                //TODO: Inspect spell
+                index = getId(1, character.getSpellBookPageLength(character.currentSpellBookPage));
+                if (index !== -100)
+                    character.spellInfo(index);
                 break;
             case 1:
                 //TODO: Cast spell
@@ -168,13 +174,65 @@ const roomAction = (character, dungeon, keyName) => {
     }
 }
 
+const fightingAction = (character, dungeon, keyName) => {
+    if (character.isPlayer) {
+        let actionFlag = false;
+        switch (keyName) {
+            case "up":
+                currentCombatDialogueOption = currentCombatDialogueOption - 1 < 0 ? combatDialogueOptions.length - 1 : currentCombatDialogueOption - 1;
+                break;
+            case "down":
+                currentCombatDialogueOption = currentCombatDialogueOption + 1 >= combatDialogueOptions.length ? 0 : currentCombatDialogueOption + 1;
+                break;
+            case "return":
+                actionFlag = true;
+                break;
+        }
+        if (character.isFighting) {
+            if (actionFlag) {
+                executeCombatAction(character, dungeon);
+            }
+            for (let i = 0; i < combatDialogueOptions.length; i++) {
+                if (currentCombatDialogueOption === i)
+                    console.log(chalk.bold.green(`-> ${combatDialogueOptions[i]}`));
+                else
+                    console.log(chalk.green(`${combatDialogueOptions[i]}`));
+            }
+        }
+    } else {
+
+    }
+}
+
+const executeCombatAction = (character, dungeon) => {
+    if (character.isPlayer) {
+        //Attack, Block, Cast Spell, Run Away
+        switch (currentCombatDialogueOption) {
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                character.isRunningAway = true;
+                character.isFighting = false;
+                break;
+            default:
+                break;
+        }
+    } else {
+
+    }
+}
+
 export const characterAction = (character, dungeon, keyName) => {
     if (character.isPlayer) {
         if (!character.isInInventory && !character.isFighting && !character.isInSpellbook &&
             !character.isTrading && !character.isParalyzed && !character.isOverencumbered) {
             switch (keyName) {
                 case "t":
-                    console.log(chalk.blueBright("How many hours would you like to wait?\n"));
+                    console.log(chalk.blueBright("How many hours would you like to rest?\n"));
                     character.rest(getId(1, 24));
                     break;
                 case "return":
@@ -190,31 +248,34 @@ export const characterAction = (character, dungeon, keyName) => {
             } else if (character.isInSpellbook && !character.isInInventory) {
                 spellBookAction(character, dungeon, keyName);
             } else {
-
+                if (character.isFighting) {
+                    fightingAction(character, dungeon, keyName);
+                }
             }
         }
-    } else{
+    } else {
         if (!character.isInInventory && !character.isFighting && !character.isInSpellbook &&
             !character.isTrading && !character.isParalyzed && !character.isOverencumbered) {
-            let direction;
-            switch (Math.floor(Math.random() * 4)) {
-                case 0:
-                    direction = "up";
-                    break;
-                case 1:
-                    direction = "down";
-                    break;
-                case 2:
-                    direction = "left";
-                    break;
-                case 3:
-                    direction = "right";
-                    break;
-                default:
-                    break;
+            if (character.pos.x !== dungeon.playerPos.x || character.pos.y !== dungeon.playerPos.y) {
+                let direction;
+                switch (Math.floor(Math.random() * 4)) {
+                    case 0:
+                        direction = "up";
+                        break;
+                    case 1:
+                        direction = "down";
+                        break;
+                    case 2:
+                        direction = "left";
+                        break;
+                    case 3:
+                        direction = "right";
+                        break;
+                    default:
+                        break;
+                }
+                moveCharacter(character, dungeon, direction);
             }
-            moveCharacter(character, dungeon, direction);
         }
     }
 }
-
