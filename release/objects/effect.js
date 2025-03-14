@@ -1,3 +1,5 @@
+import {spells} from "../resources/tables.js";
+
 export class Effect {
     name;
     //Health, Stamina, Mana, Armor, Damage, MagicResistance, MeleeResistance
@@ -74,6 +76,108 @@ export class Effect {
             case "FortifyAlteration":
                 character.alterationSkillBonus += this.magnitude * this.subtype;
                 character.alterationSkillBonus = character.alterationSkillBonus >= 1 ? 1 : character.alterationSkillBonus;
+                break;
+            case "LearnSpell":
+                switch (this.magnitude) {
+                    case 100:
+                        character.learnSpell(spells.flames.clone());
+                        break;
+                    case 101:
+                        character.learnSpell(spells.frostbite.clone());
+                        break;
+                    case 102:
+                        character.learnSpell(spells.sparks.clone());
+                        break;
+                    case 110:
+                        character.learnSpell(spells.fireBolt.clone());
+                        break;
+                    case 111:
+                        character.learnSpell(spells.freeze.clone());
+                        break;
+                    case 112:
+                        character.learnSpell(spells.lightningBolt.clone());
+                        break;
+                    case 120:
+                        character.learnSpell(spells.fireball.clone());
+                        break;
+                    case 121:
+                        character.learnSpell(spells.iceStorm.clone());
+                        break;
+                    case 122:
+                        character.learnSpell(spells.chainLightning.clone());
+                        break;
+                    case 130:
+                        character.learnSpell(spells.incinerate.clone());
+                        break;
+                    case 131:
+                        character.learnSpell(spells.icySpear.clone());
+                        break;
+                    case 132:
+                        character.learnSpell(spells.thunderbolt.clone());
+                        break;
+                    case 140:
+                        character.learnSpell(spells.fireStorm.clone());
+                        break;
+                    case 141:
+                        character.learnSpell(spells.blizzard.clone())
+                        break;
+                    case 142:
+                        character.learnSpell(spells.lightningStorm.clone());
+                        break;
+                    case 200:
+                        character.learnSpell(spells.healing.clone());
+                        break;
+                    case 201:
+                        character.learnSpell(spells.shortRest.clone());
+                        break;
+                    case 202:
+                        character.learnSpell(spells.lesserWard.clone());
+                        break;
+                    case 210:
+                        character.learnSpell(spells.fastHealing.clone());
+                        break;
+                    case 211:
+                        character.learnSpell(spells.quickRecovery.clone());
+                        break;
+                    case 212:
+                        character.learnSpell(spells.steadfastWard.clone());
+                        break;
+                    case 220:
+                        character.learnSpell(spells.closeWounds.clone());
+                        break;
+                    case 221:
+                        character.learnSpell(spells.relaxation.clone());
+                        break;
+                    case 222:
+                        character.learnSpell(spells.greaterWard.clone());
+                        break;
+                    case 230:
+                        character.learnSpell(spells.grandHealing.clone());
+                        break;
+                    case 231:
+                        character.learnSpell(spells.wakingSleep.clone());
+                        break;
+                    case 300:
+                        character.learnSpell(spells.oakFlesh.clone());
+                        break;
+                    case 310:
+                        character.learnSpell(spells.stoneFlesh.clone());
+                        break;
+                    case 320:
+                        character.learnSpell(spells.ironFlesh.clone());
+                        break;
+                    case 321:
+                        character.learnSpell(spells.paralyze.clone());
+                        break;
+                    case 330:
+                        character.learnSpell(spells.ebonyFlesh.clone());
+                        break;
+                    case 331:
+                        character.learnSpell(spells.dragonHide.clone());
+                        break;
+                    default:
+                        break;
+                }
                 break;
             default:
                 break;

@@ -509,6 +509,10 @@ export const items = {
             new Effect("Increased Health", "Health", 1, 6, 10)),
         new Item("Potion of Fortify Stamina", "Potion", "Augment|Stamina", 1, 5, 0.25,"Common", 23,
             new Effect("Increased Stamina", "Stamina", 1, 6, 10)),
+
+        //Misc (Books)
+        new Item("Spell Tome: Flames", "Misc", "Book|SpellTome", 1, 1, 1, "Common", 150,
+            new Effect("Learn Spell: Flames", "LearnSpell", 1, 1, 100)),
     ],
     uncommon: [
         //OneHanded Weapons
