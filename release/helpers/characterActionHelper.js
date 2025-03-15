@@ -154,7 +154,8 @@ const executeSpellBookAction = (character, dungeon) => {
                             console.log("Cast Failed");
                         return;
                     }
-                    autoDefend(dungeon.getFightingEnemy(), value, "Magic");
+                    if (spell.name !== "Paralyze")
+                        autoDefend(dungeon.getFightingEnemy(), value, "Magic");
                     dungeon.getFightingEnemy().addEffect(spell.effect.clone());
                 }
                 break;
@@ -169,7 +170,7 @@ const executeSpellBookAction = (character, dungeon) => {
     }
 }
 
-const roomAction = (character, dungeon, keyName) => {
+const roomAction = (character, dungeon) => {
     if (character.isPlayer) {
         const tileGold = dungeon.getTileAt(character.pos).gold;
         if (tileGold > 0) {

@@ -15,10 +15,7 @@ export const checkCombat = (player, dungeon) => {
         }
     }
     for (const enemy of dungeon.enemies) {
-        if (!enemy.isFighting && fightingFlag)
-            enemy.canAct = false;
-        else
-            enemy.canAct = true;
+        enemy.canAct = !(!enemy.isFighting && fightingFlag);
     }
 }
 
@@ -73,14 +70,15 @@ export const autoDefend = (character, rawDamage, damageType) => {
 
 export const warriorCombatAction = (character, player) => {
     if (character.health <= 0.1 * (character.maxHealth + character.healthBonus)) {
-        const temp = [];
+        let temp = -1;
         for (let i = 0; i < character.inventory.potions.length; i++) {
-            if (character.inventory.potions.length[i].name.includes("Health")) {
-                temp.push(i);
+            if (character.inventory.potions[i].name.includes("Health")) {
+                temp = i;
+                break;
             }
         }
-        if (temp.length > 0) {
-            character.usePotion(temp[0], 3);
+        if (temp >= 0) {
+            character.usePotion(temp, 3);
             character.hasActed = true;
         }
     }
@@ -97,10 +95,11 @@ export const mageCombatAction = (character, player) => {
     }
 
     if (character.mana < minDestructionSpellManaValue) {
-        const temp = [];
+        let temp = -1;
         for (let i = 0; i < character.inventory.potions.length; i++) {
-            if (character.inventory.potions.length[i].name.includes("Mana")) {
-                temp.push(i);
+            if (character.inventory.potions[i].name.includes("Mana")) {
+                temp = i;
+                break;
             }
         }
         if (temp.length > 0) {
@@ -134,17 +133,17 @@ export const mageCombatAction = (character, player) => {
         if (effect.name.includes("Armor"))
             hasArmorEffect = true;
 
-    if (!hasArmorEffect && !character.hasActed) {
+    if (!hasArmorEffect && !character.hasActed && alterationSpellIndex >= 0) {
         character.castSpell(alterationSpellIndex, 3);
         character.hasActed = true;
     }
 
-    if (character.health < 0.2 * (character.maxHealth + character.healthBonus) && !character.hasActed) {
+    if (character.health < 0.2 * (character.maxHealth + character.healthBonus) && !character.hasActed && restorationSpellIndex >= 0) {
         character.castSpell(restorationSpellIndex, 2);
         character.hasActed = true;
     }
 
-    if (!character.hasActed) {
+    if (!character.hasActed && destructionSpellIndex >= 0) {
         character.hasActed = true;
         const {success, value, spell, target} = character.castSpell(destructionSpellIndex, 1);
         if (!success || !character.isFighting || target !== "target") {
@@ -158,14 +157,16 @@ export const mageCombatAction = (character, player) => {
 
 export const thiefCombatAction = (character, player) => {
     if (character.health <= 0.1 * (character.maxHealth + character.healthBonus)) {
-        const temp = [];
+        let temp = -1;
         for (let i = 0; i < character.inventory.potions.length; i++) {
-            if (character.inventory.potions.length[i].name.includes("Health")) {
-                temp.push(i);
+            if (character.inventory.potions[i].name.includes("Health")) {
+                temp = i;
+                break;
             }
         }
-        if (temp.length > 0) {
-            character.usePotion(temp[0], 3);
+
+        if (temp >= 0) {
+            character.usePotion(temp, 3);
             character.hasActed = true;
         }
     }

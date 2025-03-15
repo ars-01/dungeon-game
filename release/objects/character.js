@@ -1090,7 +1090,7 @@ export class Character {
             default:
                 break;
         }
-        console.log(`${this.name} attempts to cast \n${spell.detailedInfo()}\n\n(remove this from character.castSpell)\n`);
+        //console.log(`${this.name} attempts to cast \n${spell.detailedInfo()}\n\n(remove this from character.castSpell)\n`);
         let manaCost = spell.manaCost;
         if (manaCost >= 0)
             switch (spell.school) {
