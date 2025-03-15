@@ -135,6 +135,7 @@ const characterFromJSON = (data) => {
     character.isParalyzed = data.isParalyzed;
 
     character.canAct = data.canAct;
+    character.hasActed = data.hasActed;
     character.isRunningAway = data.isRunningAway;
     character.isOverencumbered = data.isOverencumbered;
     character.isTrading = data.isTrading;

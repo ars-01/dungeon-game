@@ -45,6 +45,7 @@ export class Character {
     isParalyzed = false;
 
     canAct = true;
+    hasActed = false;
     isRunningAway = false;
     isOverencumbered = false;
     isTrading = false;
@@ -150,6 +151,7 @@ export class Character {
         copy.isParalyzed = this.isParalyzed;
 
         copy.canAct = this.canAct;
+        copy.hasActed = this.hasActed;
         copy.isRunningAway = this.isRunningAway;
         copy.isOverencumbered = this.isOverencumbered;
         copy.isTrading = this.isTrading;
@@ -990,6 +992,7 @@ export class Character {
     onStartTurn() {
         this.applyEffects();
         this.isOverencumbered = (this.getEncumbrance() > this.getMaxEncumbrance());
+        this.hasActed = false;
     }
 
     onEndTurn() {
@@ -1096,17 +1099,17 @@ export class Character {
                         return output;
                     output.value = Math.floor(spell.value * (1 + (this.destructionSkill / 100)));
                     output.spell = spell.clone();
-                    manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.destructionSkill >= 100 ? 1 : (101 - this.destructionSkill)))) * (1 - this.destructionSkillBonus));
+                    manaCost = spell.getReducedManaValue(this.destructionSkill, this.destructionSkillBonus);
                     output.target = "target";
                     break;
                 case "Restoration":
                     output.value = Math.floor(spell.value * (1 + (this.restorationSkill / 100)));
-                    manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.restorationSkill >= 100 ? 1 : (101 - this.restorationSkill)))) * (1 - this.restorationSkillBonus));
+                    manaCost = spell.getReducedManaValue(this.restorationSkill, this.restorationSkillBonus);
                     output.target = "self";
                     break;
                 case "Alteration":
                     output.value = spell.value;
-                    manaCost = Math.ceil(spell.manaCost * (1 - (1 / (this.alterationSkill >= 100 ? 1 : (101 - this.alterationSkill)))) * (1 - this.alterationSkillBonus));
+                    manaCost = spell.getReducedManaValue(this.alterationSkill, this.alterationSkillBonus);
                     output.target = "self";
                     break;
                 default:

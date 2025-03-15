@@ -4,26 +4,35 @@ import readline from "readline";
 import {Dungeon} from "./objects/dungeon.js";
 import {Character} from "./objects/character.js";
 import {characterAction} from "./helpers/characterActionHelper.js";
-import {getAllSpellTomes, getRandomSpellTome, items} from "./resources/tables.js";
-import {getRandomLeveledEnemy} from "./helpers/npcHelper.js";
-import {getId} from "./helpers/functionsHelper.js";
+import {
+    getAllSpellTomes, getRandomArmsPiece, getRandomFootPiece,
+    getRandomHeadPiece,
+    getRandomMainPiece, getRandomShield, getRandomWeapon,
+} from "./resources/tables.js";
 import {checkCombat} from "./helpers/combatHelper.js";
 
 readline.emitKeypressEvents(process.stdin);
 if (process.stdin.isTTY)
     process.stdin.setRawMode(true);
 
-let player = new Character("Player", {x: 0, y: 0}, 100, 100, 100, true, 1);
+let player = new Character("Player", {x: 0, y: 0}, 10000, 10000, 10000, true);
 let root = generateNewTopology();
 let dungeon = new Dungeon(root, player.characterLevel);
 dungeon.playerPos = {x: player.pos.x, y: player.pos.y};
 dungeon.print();
 console.log("\x1b[?25l");
 
-player.addItemToInventory(items.common[0].clone());
-player.addItemToInventory(items.rare[0].clone());
-player.addItemToInventory(items.mythic[11].clone());
-player.addItemToInventory(items.rare[29].clone());
+player.addItemToInventory(getRandomHeadPiece("Mythic", "LightArmor"));
+player.addItemToInventory(getRandomMainPiece("Mythic", "LightArmor"));
+player.addItemToInventory(getRandomArmsPiece("Mythic", "LightArmor"));
+player.addItemToInventory(getRandomFootPiece("Mythic", "LightArmor"));
+player.addItemToInventory(getRandomHeadPiece("Mythic", "HeavyArmor"));
+player.addItemToInventory(getRandomMainPiece("Mythic", "HeavyArmor"));
+player.addItemToInventory(getRandomArmsPiece("Mythic", "HeavyArmor"));
+player.addItemToInventory(getRandomFootPiece("Mythic", "HeavyArmor"));
+player.addItemToInventory(getRandomWeapon("Mythic", "OneHanded"));
+player.addItemToInventory(getRandomWeapon("Mythic", "TwoHanded"));
+player.addItemToInventory(getRandomShield("Mythic"));
 for (const item of getAllSpellTomes())
     player.addItemToInventory(item);
 
@@ -66,12 +75,12 @@ process.stdin.on('keypress', async (chunk, key) => {
     dungeon.playerPos = {x: player.pos.x, y: player.pos.y};
     if (!player.isInInventory && !player.isInSpellbook && !player.isTrading && !player.isFighting) {
         if (!player.isRunningAway)
-            dungeon.enemyTurn();
+            dungeon.enemyTurn(player);
         dungeon.print();
     }
     checkCombat(player, dungeon);
     if (player.isFighting && !player.isRunningAway && !player.isInInventory && !player.isInSpellbook) {
-        dungeon.enemyTurn();
+        dungeon.enemyTurn(player);
     }
     player.printStatus();
     dungeon.cleanup();

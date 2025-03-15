@@ -57,4 +57,8 @@ export class Spell {
         outputString += `Mana Cost: ${this.manaCost}`;
         console.log(outputString);
     }
+
+    getReducedManaValue(skillLevel, skillBonus) {
+        return Math.ceil(this.manaCost * (1 - (1 / (skillLevel >= 100 ? 1 : (101 - skillLevel)))) * (1 - skillBonus))
+    }
 }

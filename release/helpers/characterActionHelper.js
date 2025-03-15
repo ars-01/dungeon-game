@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import {getId} from "./functionsHelper.js";
-import {autoDefend} from "./combatHelper.js";
+import {autoDefend, mageCombatAction, thiefCombatAction, warriorCombatAction} from "./combatHelper.js";
 
 const inventoryDialogueOptions = ["Inspect", "Drop", "Use", "Exit"];
 let currentInventoryDialogueOption = 0;
@@ -191,7 +191,7 @@ const roomAction = (character, dungeon, keyName) => {
 
 const fightingAction = (character, dungeon, keyName) => {
     if (character.isPlayer) {
-        dungeon.triggerEnemyEffects();
+        dungeon.onEnemiesStartTurn();
         let actionFlag = false;
         switch (keyName) {
             case "up":
@@ -248,7 +248,7 @@ const executeCombatAction = (character, dungeon) => {
     }
 }
 
-export const characterAction = (character, dungeon, keyName) => {
+export const characterAction = (character, dungeon, keyName, player) => {
     if (character.isPlayer) {
         playerAttackActionFlag = false;
         if (!character.isInInventory && !character.isFighting && !character.isInSpellbook &&
@@ -300,9 +300,20 @@ export const characterAction = (character, dungeon, keyName) => {
                 moveCharacter(character, dungeon, direction);
             }
         } else {
-            if (character.isFighting && playerAttackActionFlag) {
-
-                console.log(`${character.name} wants to attack so fucking badly`);
+            if (character.isFighting && playerAttackActionFlag && !character.hasActed) {
+                switch (character.getClass()) {
+                    case "Warrior":
+                        warriorCombatAction(character, player);
+                        break;
+                    case "Mage":
+                        mageCombatAction(character, player);
+                        break;
+                    case "Thief":
+                        thiefCombatAction(character, player);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }

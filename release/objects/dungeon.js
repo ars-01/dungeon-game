@@ -56,12 +56,12 @@ export class Dungeon {
         return 0;
     }
 
-    enemyTurn() {
+    enemyTurn(player) {
         for (const tile of this.tiles) {
             tile.hasEnemy = false;
         }
         for (const enemy of this.enemies) {
-            characterAction(enemy, this);
+            characterAction(enemy, this, "", player);
             this.getTileAt(enemy.pos).hasEnemy = true;
         }
     }
@@ -73,7 +73,7 @@ export class Dungeon {
         }
     }
 
-    triggerEnemyEffects() {
+    onEnemiesStartTurn() {
         for (const enemy of this.enemies) {
             enemy.onStartTurn();
         }
