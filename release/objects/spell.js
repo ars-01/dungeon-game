@@ -26,26 +26,26 @@ export class Spell {
     }
 
     detailedInfo() {
-        let outputString = `\n${chalk.bold.blue(this.name)}\n\n`;
+        let outputString = `\n${chalk.bold.blueBright(this.name)}\n\n`;
         outputString += `School: ${this.school}\n`;
         outputString += `Subtype: ${this.subtype}\n`;
         switch (this.school) {
             case "Destruction":
                 outputString += `Deals ${this.value} damage`;
                 if (this.effect)
-                    outputString += ` and applies Effect: ${chalk.blue(this.effect.toString())} to target\n`;
+                    outputString += ` and applies Effect: ${chalk.blueBright(this.effect.toString())} to target\n`;
                 else
                     outputString += ` to target\n`;
                 break;
             case "Restoration":
-                if (this.effect)
-                    outputString += `Applies Effect: ${chalk.blue(this.effect.toString())} to self\n`;
+                if (this.effect && this.subtype !== "Armor|MagicResistance")
+                    outputString += `Applies Effect: ${chalk.blueBright(this.effect.toString())} to self\n`;
                 else
                     outputString += `Restores ${this.value} ${this.subtype} to self\n`;
                 break;
             case "Alteration":
                 if (this.effect)
-                    outputString += `Applies Effect: ${chalk.blue(this.effect.toString())}`;
+                    outputString += `Applies Effect: ${chalk.blueBright(this.effect.toString())}`;
                 if (this.subtype === "Paralyze")
                     outputString += ` to target\n`;
                 else

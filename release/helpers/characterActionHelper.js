@@ -11,6 +11,8 @@ let currentSpellBookDialogueOption = 0;
 const combatDialogueOptions = ["Attack", "Block", "Cast Spell", "Run Away"];
 let currentCombatDialogueOption = 0;
 
+let playerAttackActionFlag = false;
+
 const moveCharacter = (character, dungeon, keyName) => {
     character.onStartTurn();
     character.isRunningAway = false;
@@ -145,12 +147,14 @@ const executeSpellBookAction = (character, dungeon) => {
                 index = getId(1, character.getSpellBookPageLength(character.currentSpellBookPage));
                 if (index !== -100) {
                     const {success, value, spell, target} = character.castSpell(index);
+                    if (success && character.isFighting)
+                        playerAttackActionFlag = true;
                     if (!success || !character.isFighting || target !== "target") {
                         if (!success)
                             console.log("Cast Failed");
                         return;
                     }
-                    dungeon.getFightingEnemy().takeDamage(value, "Magic");
+                    autoDefend(dungeon.getFightingEnemy(), value, "Magic");
                     dungeon.getFightingEnemy().addEffect(spell.effect.clone());
                 }
                 break;
@@ -187,6 +191,7 @@ const roomAction = (character, dungeon, keyName) => {
 
 const fightingAction = (character, dungeon, keyName) => {
     if (character.isPlayer) {
+        dungeon.triggerEnemyEffects();
         let actionFlag = false;
         switch (keyName) {
             case "up":
@@ -222,9 +227,11 @@ const executeCombatAction = (character, dungeon) => {
             case 0:
                 const rawDamage = character.getMeleeDamage();
                 autoDefend(dungeon.getFightingEnemy(), rawDamage, "Melee");
+                playerAttackActionFlag = true;
                 break;
             case 1:
                 character.block();
+                playerAttackActionFlag = true;
                 break;
             case 2:
                 character.isInSpellbook = true;
@@ -243,6 +250,7 @@ const executeCombatAction = (character, dungeon) => {
 
 export const characterAction = (character, dungeon, keyName) => {
     if (character.isPlayer) {
+        playerAttackActionFlag = false;
         if (!character.isInInventory && !character.isFighting && !character.isInSpellbook &&
             !character.isTrading && !character.isParalyzed && !character.isOverencumbered) {
             switch (keyName) {
@@ -270,7 +278,7 @@ export const characterAction = (character, dungeon, keyName) => {
         }
     } else {
         if (!character.isInInventory && !character.isFighting && !character.isInSpellbook &&
-            !character.isTrading && !character.isParalyzed && !character.isOverencumbered) {
+            !character.isTrading && !character.isParalyzed && !character.isOverencumbered && character.canAct) {
             if (character.pos.x !== dungeon.playerPos.x || character.pos.y !== dungeon.playerPos.y) {
                 let direction;
                 switch (Math.floor(Math.random() * 4)) {
@@ -290,6 +298,11 @@ export const characterAction = (character, dungeon, keyName) => {
                         break;
                 }
                 moveCharacter(character, dungeon, direction);
+            }
+        } else {
+            if (character.isFighting && playerAttackActionFlag) {
+
+                console.log(`${character.name} wants to attack so fucking badly`);
             }
         }
     }

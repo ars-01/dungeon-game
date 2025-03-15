@@ -273,7 +273,7 @@ const equipCharacter = (character, characterClass) => {
             break;
         case 1:
             armorClassString = "Clothing";
-            weaponClassString = "Staff";
+            weaponClassString = "OneHanded|Dagger";
             break;
         case 2:
             armorClassString = "LightArmor";

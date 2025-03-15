@@ -26,6 +26,9 @@ export class Effect {
             character.tidyEffects();
             this.subtype = 0;
         }
+        if (this.timeToLive > 9999900) {
+            this.timeToLive = 10000000;
+        }
         switch (this.type) {
             case "Health":
                 character.healthBonus += this.magnitude * this.subtype;
@@ -190,6 +193,6 @@ export class Effect {
     }
 
     toString() {
-        return `${this.name}: ${this.subtype * this.magnitude} to ${this.type}, ${this.timeToLive} rounds remaining`;
+        return `${this.name}: ${this.subtype * this.magnitude} to ${this.type} ${this.timeToLive < 10000 ? ", " + this.timeToLive + "rounds remaining" : ""}`;
     }
 }

@@ -8,6 +8,7 @@ export class Character {
     name;
     pos = {x: 0, y: 0};
     isPlayer;
+    deleted = false;
 
     maxHealth;
     health;
@@ -108,12 +109,17 @@ export class Character {
         this.canTrade = canTrade;
     }
 
+    markForDelete() {
+        this.deleted = true;
+    }
+
     clone() {
         const copy = new Character(this.name, this.pos, this.maxHealth, this.maxStamina, this.maxMana, this.characterLevel, this.isPlayer, this.canTrade);
         copy.healthBonus = this.healthBonus;
         copy.staminaBonus = this.staminaBonus;
         copy.manaBonus = this.manaBonus;
         copy.gold = this.gold;
+        copy.deleted = this.deleted;
 
         for (const weapon of this.inventory.weapons)
             copy.inventory.weapons.push(weapon.clone());
@@ -429,7 +435,6 @@ export class Character {
             return;
         switch (page) {
             case 0:
-                //console.log(index);
                 const temp = this.getCumulatedInventory();
                 return this.removeItemFromInventory(temp[index].originalIndex, temp[index].type);
             case 1:
@@ -443,6 +448,19 @@ export class Character {
             default:
                 return;
         }
+    }
+
+    removeAllItems() {
+        const items = [];
+        for (const item of this.inventory.weapons.splice(0, this.inventory.weapons.length))
+            items.push(item);
+        for (const item of this.inventory.apparel.splice(0, this.inventory.apparel.length))
+            items.push(item);
+        for (const item of this.inventory.potions.splice(0, this.inventory.potions.length))
+            items.push(item);
+        for (const item of this.inventory.misc.splice(0, this.inventory.misc.length))
+            items.push(item);
+        return items;
     }
 
     itemInfo(index, page = this.currentInventoryPage) {
@@ -697,48 +715,65 @@ export class Character {
     getMostCommonArmorType() {
         let light = 0;
         let heavy = 0;
+        let none = 0;
         if (this.equipment.head)
             if (this.equipment.head.getSubTypes()[1] === "HeavyArmor")
                 heavy++;
             else if (this.equipment.head.getSubTypes()[1] === "LightArmor")
                 light++;
+            else
+                none++;
         if (this.equipment.main)
             if (this.equipment.main.getSubTypes()[1] === "HeavyArmor")
                 heavy++;
             else if (this.equipment.main.getSubTypes()[1] === "LightArmor")
                 light++;
+            else
+                none++;
         if (this.equipment.arms)
             if (this.equipment.arms.getSubTypes()[1] === "HeavyArmor")
                 heavy++;
             else if (this.equipment.arms.getSubTypes()[1] === "LightArmor")
                 light++;
+            else
+                none++;
         if (this.equipment.feet)
             if (this.equipment.feet.getSubTypes()[1] === "HeavyArmor")
                 heavy++;
             else if (this.equipment.feet.getSubTypes()[1] === "LightArmor")
                 light++;
+            else
+                none++;
         if (this.isBlocking)
             if (this.equipment.shield)
                 if (this.equipment.shield.getSubTypes()[1] === "HeavyArmor")
                     heavy++;
                 else if (this.equipment.shield.getSubTypes()[1] === "LightArmor")
                     light++;
-        return light < heavy ? "HeavyArmor" : "LightArmor";
+                else
+                    none++;
+
+        if (none > heavy + light)
+            return "None";
+        if (light > heavy)
+            return "LightArmor";
+        else
+            return "HeavyArmor";
     }
 
     unequipAll() {
         if (this.inventory.weapon)
-            this.inventory.push(this.equipment.weapon);
+            this.inventory.weapons.push(this.equipment.weapon);
         if (this.equipment.head)
-            this.inventory.push(this.equipment.head);
+            this.inventory.apparel.push(this.equipment.head);
         if (this.equipment.main)
-            this.inventory.push(this.equipment.main);
+            this.inventory.apparel.push(this.equipment.main);
         if (this.equipment.arms)
-            this.inventory.push(this.equipment.arms);
+            this.inventory.apparel.push(this.equipment.arms);
         if (this.equipment.feet)
-            this.inventory.push(this.equipment.feet);
+            this.inventory.apparel.push(this.equipment.feet);
         if (this.equipment.shield)
-            this.inventory.push(this.equipment.shield);
+            this.inventory.apparel.push(this.equipment.shield);
 
         this.equipment.weapon = null;
         this.equipment.head = null;
@@ -790,6 +825,9 @@ export class Character {
         this.attackBonus = 0;
         this.magicResistance = 0;
         this.meleeResistance = 0;
+        this.destructionSkillBonus = 0;
+        this.restorationSkillBonus = 0;
+        this.alterationSkillBonus = 0;
     }
 
     printEffects() {
@@ -951,10 +989,12 @@ export class Character {
 
     onStartTurn() {
         this.applyEffects();
-        this.isOverencumbered = (this.getEncumbrance() > this.getMaxEncumbrance())
+        this.isOverencumbered = (this.getEncumbrance() > this.getMaxEncumbrance());
     }
 
     onEndTurn() {
+        if (this.health <= 0)
+            this.markForDelete();
         this.health  += 1;
         if (this.health > this.maxHealth + this.healthBonus)
             this.health = this.maxHealth + this.healthBonus;
@@ -977,6 +1017,21 @@ export class Character {
         }
         console.clear();
         console.log(chalk.blueBright("You awaken feeling refreshed\n"));
+    }
+
+    getClass() {
+        const warriorSkillSum = this.blockSkill + this.twoHandedSkill + this.heavyArmorSkill;
+        const mageSkillSum = this.destructionSkill + this.restorationSkill + this.alterationSkill;
+        const thiefSkillSum = this.oneHandedSkill + this.lightArmorSkill + this.speechSkill;
+
+        if (warriorSkillSum > mageSkillSum && warriorSkillSum > thiefSkillSum)
+            return "Warrior";
+        if (mageSkillSum > warriorSkillSum && mageSkillSum > thiefSkillSum)
+            return "Mage";
+        if (thiefSkillSum > mageSkillSum && thiefSkillSum > warriorSkillSum)
+            return "Thief";
+
+        return "All";
     }
 
     //combat//
@@ -1013,7 +1068,7 @@ export class Character {
 
     castSpell(index, page = this.currentSpellBookPage) {
         const output = {success: false, value: 0, spell: null, target: ""};
-        if (page === -1 || !this.isInSpellbook)
+        if (page === -1 || (!this.isInSpellbook && this.isPlayer))
             return output;
         let spell;
         switch (page) {
@@ -1032,6 +1087,7 @@ export class Character {
             default:
                 break;
         }
+        console.log(`${this.name} attempts to cast \n${spell.detailedInfo()}\n\n(remove this from character.castSpell)\n`);
         let manaCost = spell.manaCost;
         if (manaCost >= 0)
             switch (spell.school) {
@@ -1077,8 +1133,8 @@ export class Character {
                 if (!this.isFighting)
                     output.success = false;
                 const wardType = spell.name.split(" ")[0];
-                this.effects.push(new Effect(`Ward - ${wardType}`, "MagicResistance", 1, 1, spell.value));
-                this.effects.push(new Effect(`Shield - ${wardType}`, "Armor", 1, 1, spell.value * 100));
+                this.addEffect(new Effect(`Ward - ${wardType}`, "MagicResistance", 1, 1, spell.value));
+                this.addEffect(new Effect(`Shield - ${wardType}`, "Armor", 1, 1, spell.value * 100));
                 output.target = "self";
                 break;
             case "Paralysis":
@@ -1117,7 +1173,8 @@ export class Character {
             console.log(chalk.blueBright(`${this.name} takes no damage`));
         }
 
-        this.advanceSkill(this.getMostCommonArmorType(), rawDamage);
+        if (this.getMostCommonArmorType() !== "None")
+            this.advanceSkill(this.getMostCommonArmorType(), rawDamage);
 
         if (this.isBlocking && damageType !== "Magic")
             this.advanceSkill("Block", rawDamage);

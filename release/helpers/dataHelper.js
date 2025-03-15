@@ -97,9 +97,12 @@ const dungeonFromJSON = (data) => {
 
 const characterFromJSON = (data) => {
     const character = new Character(data.name, data.pos, data.maxHealth, data.maxStamina, data.maxMana, data.isPlayer, data.characterLevel, data.canTrade);
-
+    character.deleted = data.deleted;
+    character.health = data.health;
     character.healthBonus = data.healthBonus;
+    character.stamina = data.stamina;
     character.staminaBonus = data.staminaBonus;
+    character.mana = data.mana;
     character.manaBonus = data.manaBonus;
     character.gold = data.gold;
 
@@ -196,11 +199,11 @@ const effectFromJSON = (data) => {
 
 const itemFromJSON = (data) => {
     const item = new Item(data.name, data.type, data.subtypes, data.durability, data.value, data.weight, data.rarity, data.sellValue, effectFromJSON(data.effect));
-    item.subtipes = data.subtypes;
+    item.subtypes = data.subtypes;
     return item;
 }
 
 const spellFromJSON = (data) => {
-    return new Spell(data.name, data.school, data.subtypes, data.value, data.manaCost, effectFromJSON(data.effect));
+    return new Spell(data.name, data.school, data.subtype, data.value, data.manaCost, effectFromJSON(data.effect));
 }
 

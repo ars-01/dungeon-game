@@ -57,8 +57,10 @@ export class Dungeon {
     }
 
     enemyTurn() {
+        for (const tile of this.tiles) {
+            tile.hasEnemy = false;
+        }
         for (const enemy of this.enemies) {
-            this.getTileAt(enemy.pos).hasEnemy = false;
             characterAction(enemy, this);
             this.getTileAt(enemy.pos).hasEnemy = true;
         }
@@ -71,10 +73,25 @@ export class Dungeon {
         }
     }
 
-    resetFighting() {
+    triggerEnemyEffects() {
         for (const enemy of this.enemies) {
-            enemy.isFighting = false;
-            enemy.canAct = true;
+            enemy.onStartTurn();
+        }
+    }
+
+    cleanup(doCleanup = true) {
+        if (!doCleanup)
+            return;
+        for (let i = 0; i < this.enemies.length; i++) {
+            if (this.enemies[i].deleted) {
+                this.enemies[i].unequipAll();
+                for (const item of this.enemies[i].removeAllItems())
+                    this.getTileAt(this.enemies[i].pos).addItem(item);
+                this.enemies.splice(i, 1);
+                i--;
+            } else {
+                this.enemies[i].onEndTurn();
+            }
         }
     }
 

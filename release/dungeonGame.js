@@ -4,7 +4,7 @@ import readline from "readline";
 import {Dungeon} from "./objects/dungeon.js";
 import {Character} from "./objects/character.js";
 import {characterAction} from "./helpers/characterActionHelper.js";
-import {getRandomSpellTome, items} from "./resources/tables.js";
+import {getAllSpellTomes, getRandomSpellTome, items} from "./resources/tables.js";
 import {getRandomLeveledEnemy} from "./helpers/npcHelper.js";
 import {getId} from "./helpers/functionsHelper.js";
 import {checkCombat} from "./helpers/combatHelper.js";
@@ -24,7 +24,8 @@ player.addItemToInventory(items.common[0].clone());
 player.addItemToInventory(items.rare[0].clone());
 player.addItemToInventory(items.mythic[11].clone());
 player.addItemToInventory(items.rare[29].clone());
-player.addItemToInventory(getRandomSpellTome("Common"));
+for (const item of getAllSpellTomes())
+    player.addItemToInventory(item);
 
 process.stdin.on('keypress', async (chunk, key) => {
     if (!key) return;
@@ -69,6 +70,10 @@ process.stdin.on('keypress', async (chunk, key) => {
         dungeon.print();
     }
     checkCombat(player, dungeon);
+    if (player.isFighting && !player.isRunningAway && !player.isInInventory && !player.isInSpellbook) {
+        dungeon.enemyTurn();
+    }
     player.printStatus();
+    dungeon.cleanup();
 });
 

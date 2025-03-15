@@ -188,29 +188,32 @@ export const getRandomFootPiece = (rarity, armorClass) => {
 }
 
 export const getRandomWeapon = (rarity, weaponClass) => {
+    if (!weaponClass.includes("|"))
+        weaponClass += "|";
     const temp = [];
+    const tags = weaponClass.split("|");
     switch (rarity) {
         case "Common":
             for (const item of items.common) {
-                if (item.type === "Weapon" && item.getSubTypes()[1] === weaponClass)
+                if (item.type === "Weapon" && item.getSubTypes()[1] === tags[0] && item.name.includes(tags[1]))
                     temp.push(item.clone());
             }
             break;
         case "Uncommon":
             for (const item of items.uncommon) {
-                if (item.type === "Weapon" && item.getSubTypes()[1] === weaponClass)
+                if (item.type === "Weapon" && item.getSubTypes()[1] === tags[0] && item.name.includes(tags[1]))
                     temp.push(item.clone());
             }
             break;
         case "Rare":
             for (const item of items.rare) {
-                if (item.type === "Weapon" && item.getSubTypes()[1] === weaponClass)
+                if (item.type === "Weapon" && item.getSubTypes()[1] === tags[0] && item.name.includes(tags[1]))
                     temp.push(item.clone());
             }
             break;
         case "Mythic":
             for (const item of items.mythic) {
-                if (item.type === "Weapon" && item.getSubTypes()[1] === weaponClass)
+                if (item.type === "Weapon" && item.getSubTypes()[1] === tags[0] && item.name.includes(tags[1]))
                     temp.push(item.clone());
             }
             break;
@@ -284,6 +287,32 @@ export const getRandomSpellTome = (rarity) => {
             return null;
     }
     return temp[Math.floor(Math.random() * temp.length)];
+}
+
+export const getAllSpellTomes = () => {
+    const temp = [];
+
+    for (const item of items.common) {
+        if (item.type === "Misc" && item.getSubTypes()[0] === "Book" && item.getSubTypes()[1] === "SpellTome")
+            temp.push(item.clone());
+    }
+
+    for (const item of items.uncommon) {
+        if (item.type === "Misc" && item.getSubTypes()[0] === "Book" && item.getSubTypes()[1] === "SpellTome")
+            temp.push(item.clone());
+    }
+
+    for (const item of items.rare) {
+        if (item.type === "Misc" && item.getSubTypes()[0] === "Book" && item.getSubTypes()[1] === "SpellTome")
+            temp.push(item.clone());
+    }
+
+    for (const item of items.mythic) {
+        if (item.type === "Misc" && item.getSubTypes()[0] === "Book" && item.getSubTypes()[1] === "SpellTome")
+            temp.push(item.clone());
+    }
+
+    return temp;
 }
 
 export const getRandomPotion = (rarity) => {
@@ -630,31 +659,31 @@ export const items = {
 
         //Clothing
         new Item("Novice Black Robes of Destruction", "Apparel", "Main|Clothing", 125, 0, 1, "Common", 230,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.06)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.06)),
         new Item("Novice Black Robes of Restoration", "Apparel", "Main|Clothing", 125, 0, 1, "Common", 230,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.06)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.06)),
         new Item("Novice Black Robes of Alteration", "Apparel", "Main|Clothing", 125, 0, 1, "Common", 230,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.06)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.06)),
         new Item("Novice Robes of Destruction", "Apparel", "Main|Clothing", 125, 0, 1, "Common", 250,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.06)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.06)),
         new Item("Novice Robes of Restoration", "Apparel", "Main|Clothing", 125, 0, 1, "Common", 250,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.06)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.06)),
         new Item("Novice Robes of Alteration", "Apparel", "Main|Clothing", 125, 0, 1, "Common", 250,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.06)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.06)),
 
         new Item("Copper and Ruby Circlet of Minor Destruction", "Apparel", "Head|Clothing", 125, 0, 1, "Common", 130,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.06)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.06)),
         new Item("Copper and Moonstone Circlet of Minor Restoration", "Apparel", "Head|Clothing", 125, 0, 1, "Common", 130,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.06)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.06)),
         new Item("Copper and Sapphire Circlet of Minor Alteration", "Apparel", "Head|Clothing", 125, 0, 1, "Common", 130,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.06)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.06)),
 
         new Item("Copper Ruby Ring of Minor Destruction", "Apparel", "Arms|Clothing", 125, 0, 1, "Common", 90,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.06)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.06)),
         new Item("Copper Garnet Ring of Minor Restoration", "Apparel", "Arms|Clothing", 125, 0, 1, "Common", 90,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.06)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.06)),
         new Item("Copper Sapphire Ring of Minor Alteration", "Apparel", "Arms|Clothing", 125, 0, 1, "Common", 90,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.06)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.06)),
 
         new Item("Ragged Boots", "Apparel", "Feet|Clothing", 125, 0, 1, "Common", 1),
 
@@ -762,31 +791,31 @@ export const items = {
 
         //Clothing
         new Item("Black Robes of Destruction", "Apparel", "Main|Clothing", 250, 0, 1, "Uncommon", 800,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.12)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.12)),
         new Item("Black Robes of Restoration", "Apparel", "Main|Clothing", 250, 0, 1, "Uncommon", 800,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.12)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.12)),
         new Item("Black Robes of Alteration", "Apparel", "Main|Clothing", 250, 0, 1, "Uncommon", 800,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.12)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.12)),
         new Item("Robes of Destruction", "Apparel", "Main|Clothing", 250, 0, 1, "Uncommon", 850,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.12)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.12)),
         new Item("Robes of Restoration", "Apparel", "Main|Clothing", 250, 0, 1, "Uncommon", 850,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.12)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.12)),
         new Item("Robes of Alteration", "Apparel", "Main|Clothing", 250, 0, 1, "Uncommon", 850,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.12)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.12)),
 
         new Item("Silver and Ruby Circlet of Destruction", "Apparel", "Head|Clothing", 250, 0, 1, "Uncommon", 430,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.12)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.12)),
         new Item("Silver and Moonstone Circlet of Restoration", "Apparel", "Head|Clothing", 250, 0, 1, "Uncommon", 430,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.12)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.12)),
         new Item("Silver and Sapphire Circlet of Alteration", "Apparel", "Head|Clothing", 250, 0, 1, "Uncommon", 430,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.12)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.12)),
 
         new Item("Silver Ruby Ring of Destruction", "Apparel", "Arms|Clothing", 250, 0, 1, "Uncommon", 380,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.12)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.12)),
         new Item("Silver Garnet Ring of Restoration", "Apparel", "Arms|Clothing", 250, 0, 1, "Uncommon", 380,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.12)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.12)),
         new Item("Silver Amethyst Ring of Alteration", "Apparel", "Arms|Clothing", 250, 0, 1, "Uncommon", 380,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.12)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.12)),
 
         new Item("Boots", "Apparel", "Feet|Clothing", 250, 0, 1, "Uncommon", 5),
 
@@ -891,31 +920,31 @@ export const items = {
 
         //Clothing
         new Item("Adept Black Robes of Destruction", "Apparel", "Main|Clothing", 500, 0, 1, "Rare", 1300,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.18)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.18)),
         new Item("Adept Black Robes of Restoration", "Apparel", "Main|Clothing", 500, 0, 1, "Rare", 1300,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.18)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.18)),
         new Item("Adept Black Robes of Alteration", "Apparel", "Main|Clothing", 500, 0, 1, "Rare", 1300,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.18)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.18)),
         new Item("Adept Robes of Destruction", "Apparel", "Main|Clothing", 500, 0, 1, "Rare", 1350,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.18)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.18)),
         new Item("Adept Robes of Restoration", "Apparel", "Main|Clothing", 500, 0, 1, "Rare", 1350,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.18)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.18)),
         new Item("Adept Robes of Alteration", "Apparel", "Main|Clothing", 500, 0, 1, "Rare", 1350,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.18)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.18)),
 
         new Item("Jade and Emerald Circlet of Major Destruction", "Apparel", "Head|Clothing", 500, 0, 1, "Rare", 780,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.18)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.18)),
         new Item("Jade and Moonstone Circlet of Major Restoration", "Apparel", "Head|Clothing", 500, 0, 1, "Rare", 780,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.18)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.18)),
         new Item("Jade and Sapphire Circlet of Major Alteration", "Apparel", "Head|Clothing", 500, 0, 1, "Rare", 780,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.18)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.18)),
 
         new Item("Gold Emerald Ring of Major Destruction", "Apparel", "Arms|Clothing", 500, 0, 1, "Rare", 670,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.18)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.18)),
         new Item("Gold Garnet Ring of Major Restoration", "Apparel", "Arms|Clothing", 500, 0, 1, "Rare", 670,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.18)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.18)),
         new Item("Gold Sapphire Ring of Major Alteration", "Apparel", "Arms|Clothing", 500, 0, 1, "Rare", 670,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.18)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.18)),
 
         new Item("Fine Boots", "Apparel", "Feet|Clothing", 500, 0, 1, "Rare", 20),
 
@@ -1019,31 +1048,31 @@ export const items = {
 
         //Clothing
         new Item("Archmage Black Robes of Destruction", "Apparel", "Main|Clothing", 1000, 0, 1, "Mythic", 1800,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.25)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.25)),
         new Item("Archmage Black Robes of Restoration", "Apparel", "Main|Clothing", 1000, 0, 1, "Mythic", 1800,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.25)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.25)),
         new Item("Archmage Black Robes of Alteration", "Apparel", "Main|Clothing", 1000, 0, 1, "Mythic", 1800,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.25)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.25)),
         new Item("Archmage Robes of Destruction", "Apparel", "Main|Clothing", 1000, 0, 1, "Mythic", 1850,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.25)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.25)),
         new Item("Archmage Robes of Restoration", "Apparel", "Main|Clothing", 1000, 0, 1, "Mythic", 1850,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.25)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.25)),
         new Item("Archmage Robes of Alteration", "Apparel", "Main|Clothing", 1000, 0, 1, "Mythic", 1850,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.25)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.25)),
 
         new Item("Gold and Ruby Circlet of Imminent Destruction", "Apparel", "Head|Clothing", 1000, 0, 1, "Mythic", 780,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.25)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.25)),
         new Item("Jade and Diamond Circlet of Holy Restoration", "Apparel", "Head|Clothing", 1000, 0, 1, "Mythic", 780,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.25)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.25)),
         new Item("Jade and Sapphire Circlet of Twisted Alteration", "Apparel", "Head|Clothing", 1000, 0, 1, "Mythic", 780,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.25)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.25)),
 
         new Item("Ebony Ruby Ring of Imminent Destruction", "Apparel", "Arms|Clothing", 1000, 0, 1, "Mythic", 690,
-            new Effect("Fortify Destruction", "Destruction", 1, Infinity, 0.25)),
+            new Effect("Fortify Destruction", "FortifyDestruction", 1, 10000000, 0.25)),
         new Item("Ebony Diamond Ring of Holy Restoration", "Apparel", "Arms|Clothing", 1000, 0, 1, "Mythic", 690,
-            new Effect("Fortify Restoration", "Restoration", 1, Infinity, 0.25)),
+            new Effect("Fortify Restoration", "FortifyRestoration", 1, 10000000, 0.25)),
         new Item("Ebony Sapphire Ring of Twisted Alteration", "Apparel", "Arms|Clothing", 1000, 0, 1, "Mythic", 690,
-            new Effect("Fortify Alteration", "Alteration", 1, Infinity, 0.25)),
+            new Effect("Fortify Alteration", "FortifyAlteration", 1, 10000000, 0.25)),
 
         new Item("Cuffed Boots", "Apparel", "Feet|Clothing", 1000, 0, 1, "Mythic", 25),
 
