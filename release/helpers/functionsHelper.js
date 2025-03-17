@@ -1,6 +1,7 @@
 import promptSync from "prompt-sync";
 
 const prompt = promptSync();
+const nameRegex = /^[A-Za-z ]+$/;
 
 export const checkSkill = (skillLevel, skillXP, skillXPClass) => {
     switch (skillXPClass) {
@@ -30,4 +31,12 @@ export const getId = (min, max) => {
             return -100;
     }
     return id - 1;
+}
+
+export const enterString = (promptString) => {
+    let output = "";
+    while (!nameRegex.test(output)) {
+        output = prompt(promptString);
+    }
+    return output;
 }

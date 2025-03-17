@@ -18,18 +18,46 @@ export const saveGraph = async (root) => {
     });
 }
 
-export const saveDungeon = async (dungeon) => {
+export const saveDungeon = async (dungeon, saveName) => {
     const dungeonJSON = JSON.stringify(dungeon.getSimplifiedDungeon(), null, 4);
-    await fs.writeFile(`./resources/dungeon.json`, dungeonJSON, function (err) {
+    await fs.writeFile(`./resources/${saveName.replaceAll(" ", "_")}_dungeon.json`, dungeonJSON, function (err) {
         if (err) {
             console.error(err);
         }
     });
 }
 
-export const savePlayer = async (player) => {
+export const savePlayer = async (player, saveName) => {
     const playerJSON = JSON.stringify(player.clone(), null, 4);
-    await fs.writeFile(`./resources/player.json`, playerJSON, function (err) {
+    await fs.writeFile(`./resources/${saveName.replaceAll(" ", "_")}_player.json`, playerJSON, function (err) {
+        if (err) {
+            console.error(err);
+        }
+    });
+}
+
+export const addNewSave = async (player, dungeon, saveName = player.name) => {
+    const saveList = await JSON.parse(fs.readFileSync(`./resources/save_list.json`, 'utf8'));
+    for (let i = 0; i < saveList.length; i++) {
+        if (saveList[i] === saveName) {
+            saveList.splice(i, 1);
+            i--;
+        }
+    }
+    saveList.unshift(saveName);
+    const _saveList = JSON.stringify(saveList);
+    await fs.writeFile(`./resources/save_list.json`, _saveList, function (err) {
+        if (err) {
+            console.error(err);
+        }
+    });
+    await savePlayer(player, saveName);
+    await saveDungeon(dungeon, saveName);
+}
+
+export const wipeSaveData = async () => {
+    const saveList = JSON.stringify([]);
+    await fs.writeFile(`./resources/save_list.json`, saveList, function (err) {
         if (err) {
             console.error(err);
         }
@@ -43,8 +71,8 @@ export const loadGraph = async () => {
     return await graphFromJSON(_root);
 }
 
-export const loadDungeon = async () => {
-    const _dungeon = await JSON.parse(fs.readFileSync(`./resources/dungeon.json`, 'utf8'));
+export const loadDungeon = async (saveName) => {
+    const _dungeon = await JSON.parse(fs.readFileSync(`./resources/${saveName.replaceAll(" ", "_")}_dungeon.json`, 'utf8'));
     return dungeonFromJSON(_dungeon);
 }
 
@@ -53,9 +81,17 @@ export const loadTutorialDungeon = async () => {
     return dungeonFromJSON(_dungeon);
 }
 
-export const loadPlayer = async () => {
-    const _player = await JSON.parse(fs.readFileSync(`./resources/player.json`, 'utf8'));
+export const loadPlayer = async (saveName) => {
+    const _player = await JSON.parse(fs.readFileSync(`./resources/${saveName.replaceAll(" ", "_")}_player.json`, 'utf8'));
     return characterFromJSON(_player);
+}
+
+export const loadSaveList = async () => {
+    return await JSON.parse(fs.readFileSync(`./resources/save_list.json`, 'utf8'));
+}
+
+export const loadSave = async (saveName) => {
+    return { player: await loadPlayer(saveName), dungeon: await loadDungeon(saveName) };
 }
 
 //get objects from JSON
@@ -97,6 +133,7 @@ const dungeonFromJSON = (data) => {
 
 const characterFromJSON = (data) => {
     const character = new Character(data.name, data.pos, data.maxHealth, data.maxStamina, data.maxMana, data.isPlayer, data.characterLevel, data.canTrade);
+    character.isPlayer = data.isPlayer;
     character.deleted = data.deleted;
     character.health = data.health;
     character.healthBonus = data.healthBonus;

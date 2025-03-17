@@ -121,6 +121,7 @@ export class Character {
         copy.manaBonus = this.manaBonus;
         copy.gold = this.gold;
         copy.deleted = this.deleted;
+        copy.isPlayer = this.isPlayer;
 
         for (const weapon of this.inventory.weapons)
             copy.inventory.weapons.push(weapon.clone());
@@ -433,7 +434,7 @@ export class Character {
     }
 
     removeItemFromInventory(index, page = this.currentInventoryPage) {
-        if (!this.isInInventory)
+        if (!this.isInInventory && this.isPlayer)
             return;
         switch (page) {
             case 0:
