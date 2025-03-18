@@ -315,30 +315,30 @@ export const getAllSpellTomes = () => {
     return temp;
 }
 
-export const getRandomPotion = (rarity) => {
+export const getRandomPotion = (rarity, type = "") => {
     const temp = [];
     switch (rarity) {
         case "Common":
             for (const item of items.common) {
-                if (item.type === "Potion")
+                if (item.type === "Potion" && item.name.includes(type))
                     temp.push(item.clone());
             }
             break;
         case "Uncommon":
             for (const item of items.uncommon) {
-                if (item.type === "Potion")
+                if (item.type === "Potion" && item.name.includes(type))
                     temp.push(item.clone());
             }
             break;
         case "Rare":
             for (const item of items.rare) {
-                if (item.type === "Potion")
+                if (item.type === "Potion" && item.name.includes(type))
                     temp.push(item.clone());
             }
             break;
         case "Mythic":
             for (const item of items.mythic) {
-                if (item.type === "Potion")
+                if (item.type === "Potion" && item.name.includes(type))
                     temp.push(item.clone());
             }
             break;
@@ -497,7 +497,7 @@ export const roomLayouts = {
             "      ").split(""),
 }
 
-//█ ▓ ▒ ░ ▀ ▬ ■ ▀ ╔ ╗ ║ ┐
+//pixel characters: █ ▓ ▒ ░ ▀ ▬ ■ ▀ ╔ ╗ ║ ┐
 
 export const overworldWalls = {
     horizontalPassage: ("            ").split(""),
@@ -691,8 +691,11 @@ export const items = {
         new Item("Potion of Minor Healing", "Potion", "Restore|Health", 1, 25, 0.25,"Common", 17),
         new Item("Potion of Fortify Health", "Potion", "Augment|Health", 1, 5, 0.25,"Common", 23,
             new Effect("Increased Health", "Health", 1, 6, 10)),
+        new Item("Potion of Minor Stamina", "Potion", "Restore|Stamina", 1, 25, 0.25,"Common", 20),
         new Item("Potion of Fortify Stamina", "Potion", "Augment|Stamina", 1, 5, 0.25,"Common", 23,
             new Effect("Increased Stamina", "Stamina", 1, 6, 10)),
+        new Item("Potion of Minor Mana", "Potion", "Restore|Mana", 1, 25, 0.25,"Common", 20),
+
 
         //Misc (Spell Tomes)
         //Destruction
@@ -823,8 +826,10 @@ export const items = {
         new Item("Potion of Healing", "Potion", "Restore|Health", 1, 50, 0.25,"Uncommon", 36),
         new Item("Potion of Fortify Health", "Potion", "Augment|Health", 1, 10, 0.25,"Uncommon", 41,
             new Effect("Increased Health", "Health", 1, 6, 20)),
+        new Item("Potion of Stamina", "Potion", "Restore|Stamina", 1, 50, 0.25,"Uncommon", 44),
         new Item("Potion of Fortify Stamina", "Potion", "Augment|Stamina", 1, 10, 0.25,"Uncommon", 41,
             new Effect("Increased Stamina", "Stamina", 1, 6, 20)),
+        new Item("Potion of Mana", "Potion", "Restore|Mana", 1, 50, 0.25,"Uncommon", 44),
 
         //Misc (Spell Tomes)
         //Destruction
@@ -952,8 +957,10 @@ export const items = {
         new Item("Potion of Vigorous Healing", "Potion", "Restore|Health", 1, 75, 0.25,"Rare", 79),
         new Item("Potion of Fortify Health", "Potion", "Augment|Health", 1, 15, 0.25,"Rare", 85,
             new Effect("Increased Health", "Health", 1, 6, 30)),
+        new Item("Potion of Vigorous Stamina", "Potion", "Restore|Stamina", 1, 75, 0.25,"Rare", 95),
         new Item("Potion of Fortify Stamina", "Potion", "Augment|Stamina", 1, 15, 0.25,"Rare", 85,
             new Effect("Increased Stamina", "Stamina", 1, 6, 30)),
+        new Item("Potion of Vigorous Mana", "Potion", "Restore|Mana", 1, 75, 0.25,"Rare", 95),
 
         //Misc (Spell Tomes)
         //Destruction
@@ -1077,11 +1084,13 @@ export const items = {
         new Item("Cuffed Boots", "Apparel", "Feet|Clothing", 1000, 0, 1, "Mythic", 25),
 
         //Potions
-        new Item("Potion of Ultimate Healing", "Potion", "Restore|Health", 1, 100, 0.25,"Mythic", 251),
+        new Item("Potion of Ultimate Healing", "Potion", "Restore|Health", 1, 9999, 0.25,"Mythic", 251),
         new Item("Potion of Fortify Health", "Potion", "Augment|Health", 1, 20, 0.25,"Mythic", 275,
             new Effect("Increased Health", "Health", 1, 6, 30)),
+        new Item("Potion of Ultimate Stamina", "Potion", "Restore|Stamina", 1, 9999, 0.25,"Mythic", 150),
         new Item("Potion of Fortify Stamina", "Potion", "Augment|Stamina", 1, 20, 0.25,"Mythic", 275,
             new Effect("Increased Stamina", "Stamina", 1, 6, 50)),
+        new Item("Potion of Ultimate Mana", "Potion", "Restore|Mana", 1, 9999, 0.25,"Mythic", 150),
 
         //Misc (Spell Tomes)
         //Destruction
@@ -1103,4 +1112,3 @@ export const items = {
             new Effect("Learn Spell: Dragonhide", "LearnSpell", 1, 1, 331)),
     ]
 };
-

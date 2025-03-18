@@ -52,7 +52,7 @@ export const autoDefend = (character, rawDamage, damageType) => {
                     const temp = [];
                     for (let i = 0; i < character.spells.restoration.length; i++)
                         if (character.spells.restoration[i].name.includes("Ward")) {
-                            console.log(character.spells.restoration[i].name, i);
+                            //console.log(character.spells.restoration[i].name, i);
                             temp.push(i);
                         }
                     if (temp.length > 0) {
@@ -69,6 +69,7 @@ export const autoDefend = (character, rawDamage, damageType) => {
 }
 
 export const warriorCombatAction = (character, player) => {
+    console.log(`${character.name} is performing a warrior action`);
     if (character.health <= 0.1 * (character.maxHealth + character.healthBonus)) {
         let temp = -1;
         for (let i = 0; i < character.inventory.potions.length; i++) {
@@ -89,6 +90,7 @@ export const warriorCombatAction = (character, player) => {
 }
 
 export const mageCombatAction = (character, player) => {
+    console.log(`${character.name} is performing a mage action`);
     let minDestructionSpellManaValue = 10000000;
     for (const spell of character.spells.destruction) {
         minDestructionSpellManaValue = Math.min(minDestructionSpellManaValue, spell.getReducedManaValue(character.destructionSkill, character.destructionSkillBonus));
@@ -102,8 +104,8 @@ export const mageCombatAction = (character, player) => {
                 break;
             }
         }
-        if (temp.length > 0) {
-            character.usePotion(temp[0], 3);
+        if (temp >= 0) {
+            character.usePotion(temp, 3);
             character.hasActed = true;
         }
     }
@@ -111,19 +113,19 @@ export const mageCombatAction = (character, player) => {
         return;
 
     let destructionSpellIndex = -1;
-    for (let i = 0; i < character.spells.destruction; i++) {
+    for (let i = 0; i < character.spells.destruction.length; i++) {
         if (character.spells.destruction[i].manaCost <= character.mana)
             destructionSpellIndex = Math.max(destructionSpellIndex, i);
     }
 
     let restorationSpellIndex = -1;
-    for (let i = 0; i < character.spells.restoration; i++) {
+    for (let i = 0; i < character.spells.restoration.length; i++) {
         if (character.spells.restoration[i].manaCost <= character.mana && !character.spells.restoration[i].name.includes("Ward"))
             restorationSpellIndex = Math.max(restorationSpellIndex, i);
     }
 
     let alterationSpellIndex = -1;
-    for (let i = 0; i < character.spells.alteration; i++) {
+    for (let i = 0; i < character.spells.alteration.length; i++) {
         if (character.spells.alteration[i].manaCost <= character.mana)
             alterationSpellIndex = Math.max(alterationSpellIndex, i);
     }
@@ -153,9 +155,15 @@ export const mageCombatAction = (character, player) => {
         if (spell.effect)
             player.addEffect(spell.effect.clone());
     }
+
+    if (character.hasActed)
+        return;
+    const rawDamage = character.getMeleeDamage();
+    player.takeDamage(rawDamage, "Melee");
 }
 
 export const thiefCombatAction = (character, player) => {
+    console.log(`${character.name} is performing a thief action`);
     if (character.health <= 0.1 * (character.maxHealth + character.healthBonus)) {
         let temp = -1;
         for (let i = 0; i < character.inventory.potions.length; i++) {

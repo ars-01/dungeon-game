@@ -765,7 +765,7 @@ export class Character {
     }
 
     unequipAll() {
-        if (this.inventory.weapon)
+        if (this.equipment.weapon)
             this.inventory.weapons.push(this.equipment.weapon);
         if (this.equipment.head)
             this.inventory.apparel.push(this.equipment.head);
@@ -994,6 +994,7 @@ export class Character {
         this.applyEffects();
         this.isOverencumbered = (this.getEncumbrance() > this.getMaxEncumbrance());
         this.hasActed = false;
+        this.stopBlocking();
     }
 
     onEndTurn() {

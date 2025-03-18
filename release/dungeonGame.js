@@ -42,7 +42,7 @@ const devStart = () => {
     dungeon = new Dungeon(root, player.characterLevel);
     dungeon.playerPos = {x: player.pos.x, y: player.pos.y};
     dungeon.print();
-
+    startFlag = true;
     player.addItemToInventory(getRandomHeadPiece("Mythic", "LightArmor"));
     player.addItemToInventory(getRandomMainPiece("Mythic", "LightArmor"));
     player.addItemToInventory(getRandomArmsPiece("Mythic", "LightArmor"));
@@ -58,7 +58,11 @@ const devStart = () => {
         player.addItemToInventory(item);
 }
 
-const newGame = (playerName, playerClass) => {
+const newGame =  (playerName, playerClass) => {
+    if (playerName === "Dev") {
+        devStart();
+        return;
+    }
     startFlag = true;
     player = new Character(playerName, {x: 0, y: 0}, 100, 100, 100, true, 0, true);
     player.isPlayer = true;

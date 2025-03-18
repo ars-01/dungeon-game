@@ -321,17 +321,18 @@ const equipCharacter = (character, characterClass) => {
     switch (characterClass) {
         case 0:
             for (let i = 0; i < Math.floor(Math.random() * 3) + 1; i++)
-                character.addItemToInventory(getRandomPotion(itemRarity));
+                character.addItemToInventory(getRandomPotion(itemRarity, "Healing"));
             break;
         case 1:
             character.addItemToInventory(getRandomSpellTome(itemRarity));
             character.learnSpell(getRandomDestructionSpell(itemRarity));
             character.learnSpell(getRandomRestorationSpell(itemRarity));
             character.learnSpell(getRandomProtectionSpell(itemRarity));
+            character.addItemToInventory(getRandomPotion(itemRarity, "Mana"));
             break;
         case 2:
             for (let i = 0; i < Math.floor(Math.random() * 3) + 1; i++)
-                character.addItemToInventory(getRandomPotion(itemRarity));
+                character.addItemToInventory(getRandomPotion(itemRarity, "Healing"));
             break;
         default:
             break;
